@@ -12,7 +12,7 @@ const char* ssid     = "your access point's ssid";
 const char* password = "your access point's password";
 
 // use demo token or change to your token
-const char* token = "BFA0B4STJMEHIGFKNADNXIQ79";
+const char* token = "Y9hHIBjdwPEOZo6c7SafNiz3X0snuJLRTFqgDKrU";
 // use demo thing or change to your thing
 const char* thing = "weather_station";
 
@@ -56,6 +56,11 @@ void loop() {
     }
     else Serial.println("analog updating failed");
 
+    if ((value%2 == 0? Anto.stringUpdate("Name", "kohpai"): Anto.stringUpdate("Name", "farm"))) {
+        Serial.println("string updating success");
+    }
+    else Serial.println("string updating failed");
+
     Serial.print("Digital: ");
 
 // get 'input' channel
@@ -64,6 +69,12 @@ void loop() {
 
 // get 'analog' channel
     Serial.println(Anto.analogGet("analog"));
+    Serial.print("String: ");
+
+// get 'Name' channel
+    Serial.println(Anto.stringGet("Name"));
 
     Serial.println(value);
+
+
 }
