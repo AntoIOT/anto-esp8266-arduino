@@ -93,6 +93,9 @@ private:
 
     int32_t
         getAnalogValue(String json);
+
+    String
+        getStringValue(String json);
 };
 
 extern AntoIO Anto;

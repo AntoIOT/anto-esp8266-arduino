@@ -244,9 +244,40 @@ String AntoIO::stringGet(const char* channel)
 
 String AntoIO::stringGet(const char* thing, const char* channel)
 {
-    String str = "test";
+    WiFiClient client;
+    uint8_t count;
 
-    return str;
+//  String for response message.
+    String str = "";
+    
+//  Wait for client to connect to the anto api web service.
+    for (count = 10; count && !client.connect(_host, 80); --count);
+
+//    if (!count) return (str = "api wrong");
+    if (!count) return "";
+
+    client.print(String("GET ")+_getParam+_token+"/"+thing+"/"+channel+" HTTP/1.1\r\n"+"Host: "+_host+"\r\n\r\n");
+
+    for (count = 50; count && !client.available(); --count) delay(100);
+
+//    if (!count) return (str = "not available");
+    if (!count) return "";
+
+    while (client.available()) {
+        str += client.readStringUntil('\r');
+    }
+
+    str = responseFilter(str);
+
+    if (isResponseSuccess(str)) {
+        return getStringValue(str);
+    }
+/* 
+ * return real "FALSE", still thinking
+ */
+    else "";
+
+//    return str;
 }
 
 String AntoIO::responseFilter(String str)
@@ -305,6 +336,22 @@ int32_t AntoIO::getAnalogValue(String json)
     }
 
     return str.toInt();
+}
+
+String AntoIO::getStringValue(String json)
+{
+    uint8_t index;
+    String str = "";
+
+    index = json.indexOf("value\":\"")+8;
+
+    while (json.charAt(index) != '"') {
+        str += json.charAt(index);
+
+        index++;
+    }
+
+    return str;
 }
 
 AntoIO Anto;
