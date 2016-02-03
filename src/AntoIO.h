@@ -8,8 +8,6 @@
 #ifndef ANTO_IO_H
 #define ANTO_IO_H
 
-#include "ESP8266WiFi.h"
-
 class AntoIO
 {
 public:
@@ -57,25 +55,6 @@ public:
 
     //bool service(const char* device,const char* channel);
 
-/* protected:
- *     static void _scanDone(void* result, int status);
- *     void * _getScanInfoByIndex(int i);
- *     static void _smartConfigCallback(uint32_t status, void* result);
- *     static void _eventCallback(void *event);
- *     bool _smartConfigStarted;
- *     bool _smartConfigDone;
- * 
- *     bool _useApMode;
- *     bool _useClientMode;
- * 	bool _useStaticIp;
- * 	
- * 	static bool _scanAsync;
- * 	static bool _scanStarted;
- * 	static bool _scanComplete;
- * 
- *     static size_t _scanCount;
- *     static void* _scanResult;
- */
 private:
     const char
         *_host,
@@ -85,7 +64,9 @@ private:
         *_defaultThing;
 
     String 
-        responseFilter(String str);
+        responseFilter(String str),
+        requestHttp(String arg),
+        getStringValue(String json);
 
     bool
         isResponseSuccess(String json),
@@ -93,9 +74,6 @@ private:
 
     int32_t
         getAnalogValue(String json);
-
-    String
-        getStringValue(String json);
 };
 
 extern AntoIO Anto;
