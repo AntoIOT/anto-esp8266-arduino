@@ -8,69 +8,79 @@
 #ifndef ANTO_IO_H
 #define ANTO_IO_H
 
+#include "mqtt/MQTT.h"
+
 class AntoIO
 {
 public:
 
     AntoIO();
 
-    /**
-     * Start Wifi connection
-     * if passphrase is set the most secure supported mode will be automatically selected
-     * @param ssid const char*          Pointer to the SSID string.
-     * @param passphrase const char *   Optional. Passphrase. Valid characters in a passphrase must be between ASCII 32-126 (decimal).
-     * @param channel                   Optional. Channel of AP
-     * @return
-     */
-    bool begin(char* ssid, char *passphrase, char* token, char* defaultDev);
-    bool begin(const char* ssid, const char *passphrase, const char* token, const char* defaultDev);
+    bool 
+        begin(char* ssid, char *passphrase, char* token, char* user, char* defaultThing),
+        begin(const char* ssid, const char *passphrase, const char* token, const char* user, const char* defaultThing),
 
+        digitalUpdate(const char* channel, bool value),
+        digitalUpdate(const char* thing, const char* channel, bool value),
 
-   /* Wait for Wifi connection to reach a result
-    * returns the status reached or disconnect if STA is off
-    */
+        analogUpdate(const char* channel, int32_t value),
+        analogUpdate(const char* thing, const char* channel, int32_t value),
 
-    bool digitalUpdate(const char* channel, bool value);
-    bool digitalUpdate(const char* thing, const char* channel, bool value);
+        stringUpdate(const char* channel, const char* value),
+        stringUpdate(const char* thing, const char* channel, const char* value),
 
-    bool analogUpdate(const char* channel, int32_t value);
-    bool analogUpdate(const char* thing, const char* channel, int32_t value);
+        digitalGet(const char* channel),
+        digitalGet(const char* thing,const char* channel),
 
-    bool stringUpdate(const char* channel, const char* value);
-    bool stringUpdate(const char* thing, const char* channel, const char* value);
+        isConnected(void);
 
-    /* Set up an open access point
-     *
-     * param ssid: Pointer to the SSID string.
-     */
-    
-    bool digitalGet(const char* channel);
-    bool digitalGet(const char* thing,const char* channel);
+    int32_t
+        analogGet(const char* channel),
+        analogGet(const char* thing,const char* channel);
 
-    int32_t analogGet(const char* channel);
-    int32_t analogGet(const char* thing,const char* channel);
+    String 
+        stringGet(const char* channel),
+        stringGet(const char* thing,const char* channel),
 
-    String stringGet(const char* channel);
-    String stringGet(const char* thing,const char* channel);
+        requestHttp(const char*, String arg);
 
-    //bool service(const char* device,const char* channel);
+    void 
+        pub(const char *channel, const char *msg),
+        pub(const char *thing, const char *channel, const char *msg),
+
+        sub(const char *channel),
+        sub(const char *thing, const char *channel),
+        
+        connect(void),
+        onConnected(void (*)(void)),
+        onDisconnected(void (*)(void)),
+        onMsgArrv(void (*)(String&, String&)),
+        onPublished(void (*)(void));
 
 private:
+    void disconnectedCB(void);
+
     const char
         *_host,
+        *_broker,
         *_token,
+        *_user,
         *_getParam,
         *_setParam,
         *_defaultThing;
 
+    MQTT _myMqtt;
+
     String 
         responseFilter(String str),
-        requestHttp(String arg),
         getStringValue(String json);
 
     bool
         isResponseSuccess(String json),
         getDigitalValue(String json);
+
+    const uint16_t
+        _PORT = 1883;
 
     int32_t
         getAnalogValue(String json);
