@@ -21,6 +21,8 @@ const char* password = "your access point's password";
 const char* token = "79HFgUJcpQu2OIGhZeMwXR1arybqv3SAfmnkYjoK";
 // use demo thing or change to your thing
 const char* thing = "smart_plug";
+// use demo username or change to your username
+const char *user = "WHCWHC78";
 
 void setup() {
     Serial.begin(115200);
@@ -33,7 +35,7 @@ void setup() {
     Serial.print("Connecting to ");
     Serial.println(ssid);
     
-    if (!Anto.begin(ssid, password, token, thing)) {
+    if (!Anto.begin(ssid, password, token, user, thing)) {
         Serial.println("Connection failed!!");
 
         while (1);

@@ -15,6 +15,8 @@ const char* password = "your access point's password";
 const char* token = "Y9hHIBjdwPEOZo6c7SafNiz3X0snuJLRTFqgDKrU";
 // use demo thing or change to your thing
 const char* thing = "weather_station";
+// use demo username or change to your username
+const char *user = "WHCWHC78";
 
 void setup() {
     Serial.begin(115200);
@@ -27,7 +29,7 @@ void setup() {
     Serial.print("Connecting to ");
     Serial.println(ssid);
     
-    if (!Anto.begin(ssid, password, token, thing)) {
+    if (!Anto.begin(ssid, password, token, user, thing)) {
         Serial.println("Connection failed!!");
 
         while (1);
