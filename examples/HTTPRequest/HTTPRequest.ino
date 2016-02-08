@@ -8,17 +8,17 @@
 #include <AntoIO.h>
 
 // change ssid and password to yours
-const char* ssid     = "CE-ESL";
-const char* password = "ceeslonly";
+const char* ssid     = "ssid";
+const char* password = "ssid password";
 
 // use demo token or change to your token
 const char* token = "Y9hHIBjdwPEOZo6c7SafNiz3X0snuJLRTFqgDKrU";
 // use demo thing or change to your thing
 const char* thing = "weather_station";
+// use demo username or change to yours
 const char *user = "WHCWHC78";
 
 int value = 0;
-bool bIsConnected = false;
 
 void setup() {
     Serial.begin(115200);
@@ -47,4 +47,5 @@ void loop() {
 
     Serial.println("Requesting ...");
     Serial.println(Anto.requestHttp("128.199.239.49","/?name=kohpai"));
+    Serial.println(value);
 }
