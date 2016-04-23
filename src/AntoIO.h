@@ -42,7 +42,8 @@ public:
         stringGet(const char* channel),
         stringGet(const char* thing,const char* channel),
 
-        requestHttp(const char*, String arg);
+        requestHttp(const char*, String arg),
+        request(const char *arg);
 
     void 
         pub(const char *channel, const char *msg),

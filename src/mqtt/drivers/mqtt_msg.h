@@ -43,7 +43,7 @@ extern "C" {
 *
 */
 /* 7			6			5			4			3			2			1			0*/
-/*|      --- Message Type----			|  DUP Flag	|	   QoS Level		|	Retain	|
+/*|      --- Message Type----			|  DUP Flag	|	   QoS Level		|	Retain	|*/
 /*										Remaining Length								 */
 
 #define PROTOCOL_NAMEv31	/*MQTT version 3.1 compatible with Mosquitto v0.15*/

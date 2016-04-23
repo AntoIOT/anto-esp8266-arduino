@@ -1,7 +1,5 @@
-
-#include <ESP8266WiFi.h>
-#include <ArduinoJson.h>
-
+#include "json/ArduinoJson.h"
+#include "wifi/ESP8266WiFi.h"
 #include "AntoIO.h"
 
 AntoIO::AntoIO() : _host("api.anto.io"), _broker("service.anto.io"), _getParam("/channel/get/"),
@@ -49,7 +47,6 @@ bool AntoIO::digitalUpdate(const char* thing, const char* channel, bool value)
         return true;
     else 
         return false;
-
 }
 bool AntoIO::analogUpdate(const char* channel, int32_t value)
 {
@@ -224,6 +221,31 @@ String AntoIO::requestHttp(const char *host, String arg)
         str += client.readStringUntil('\r');
 
     return (str = responseFilter(str));
+}
+
+String AntoIO::request(const char *arg) 
+{
+    String str = requestHttp(_host, String("/request/") + arg);
+
+    if (str.equals(""))
+        return str;
+
+    StaticJsonBuffer<200> jsonBuffer;
+
+    JsonObject& root = jsonBuffer.parseObject(str);
+
+/* 
+ * return real "FALSE", still thinking
+ */
+    if (!root.success())
+        return "";
+    
+    if (root["result"] == true)
+        return root["value"];
+/* 
+ * return real "FALSE", still thinking
+ */
+    else "";
 }
 
 void AntoIO::connect(void)
