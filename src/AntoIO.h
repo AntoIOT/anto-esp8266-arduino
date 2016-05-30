@@ -51,6 +51,8 @@ public:
 
         sub(const char *channel),
         sub(const char *thing, const char *channel),
+
+        service(const char *name),
         
         connect(void),
         onConnected(void (*)(void)),

@@ -81,6 +81,7 @@ void connectedCB()
     Anto.sub("analog");
     Anto.sub("Name");
     Anto.sub("input");
+    Anto.service("gas.91e10.price");
 }
 
 /*

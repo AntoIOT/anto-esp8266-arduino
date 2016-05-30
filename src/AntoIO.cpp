@@ -2,6 +2,8 @@
 #include "wifi/ESP8266WiFi.h"
 #include "AntoIO.h"
 
+//gas.91e10.price
+
 AntoIO::AntoIO() : _host("api.anto.io"), _broker("service.anto.io"), _getParam("/channel/get/"),
     _setParam("/channel/set/"), _myMqtt("client1", "service.anto.io", 1883) {}
 
@@ -225,7 +227,7 @@ String AntoIO::requestHttp(const char *host, String arg)
 
 String AntoIO::request(const char *arg) 
 {
-    String str = requestHttp(_host, String("/request/") + arg);
+    String str = requestHttp(_host, String("/request/") + _token + "/" + arg);
 
     if (str.equals(""))
         return str;
@@ -285,6 +287,11 @@ void AntoIO::sub(const char *channel)
 void AntoIO::sub(const char *thing, const char *channel)
 {
     _myMqtt.subscribe(String("channel/")+_user+"/"+thing+"/"+channel);
+}
+
+void AntoIO::service(const char *name)
+{
+    _myMqtt.subscribe(String("service/")+ name);
 }
 
 void AntoIO::onMsgArrv(void (*function)(String&, String&))

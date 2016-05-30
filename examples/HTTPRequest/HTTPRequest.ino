@@ -45,7 +45,9 @@ void loop() {
     delay(5000);
     ++value;
 
-    Serial.println("Requesting ...");
+    Serial.println("Normal HTTP Requesting ...");
     Serial.println(Anto.requestHttp("128.199.239.49","/?name=kohpai"));
+    Serial.println("Service HTTP Requesting ...");
+    Serial.println(Anto.request("gas.91e10.price"));
     Serial.println(value);
 }
