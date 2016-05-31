@@ -7,64 +7,92 @@
 
 #include <AntoIO.h>
 
-// change ssid and password to yours
-const char* ssid     = "ssid";
-const char* password = "ssid password";
-
-// use demo token or change to your token
-const char* token = "Y9hHIBjdwPEOZo6c7SafNiz3X0snuJLRTFqgDKrU";
-// use demo thing or change to your thing
-const char* thing = "weather_station";
-// use demo username or change to your username
+// username of anto.io account
 const char *user = "WHCWHC78";
+
+// key of permission, generated on control panel anto.io
+const char* key = "Y9hHIBjdwPEOZo6c7SafNiz3X0snuJLRTFqgDKrU";
+
+// your default thing.
+const char* thing = "weather_station";
+
+// create AntoIO object named anto.
+// using constructor AntoIO(user, key, thing)
+// or use AntoIO(user, key, thing, clientId)
+// to generate client_id yourself.
+AntoIO anto(user, key, thing);
 
 int value = 0;
 bool bIsConnected = false;
 
 void setup() {
+    // SSID and Password of your WiFi access point.
+    const char* ssid = "ssid";
+    const char* pwd  = "pwd";
+
     Serial.begin(115200);
     delay(10);
 
-    // register callback functions
-
-    Anto.onConnected(connectedCB);
-    Anto.onDisconnected(disconnectedCB);
-    Anto.onMsgArrv(msgArrvCB);
-    Anto.onPublished(publishedCB);
-    
-    // Connect to a WiFi network and MQTT broker
-
     Serial.println();
     Serial.println();
+    Serial.print("Anto library version: ");
+    Serial.println(anto.getVersion());
     Serial.print("Connecting to ");
     Serial.println(ssid);
 
-    if (!Anto.begin(ssid, password, token, user, thing)) {
+    // Connect to your WiFi access point
+    if (!anto.begin(ssid, pwd)) {
         Serial.println("Connection failed!!");
 
+        // Stop everything.
         while (1);
     }
 
     Serial.println();
     Serial.println("WiFi connected");  
     Serial.println("Connecting to MQTT broker");
+    
+    // register callback functions
+    anto.mqtt.onConnected(connectedCB);
+    anto.mqtt.onDisconnected(disconnectedCB);
+    anto.mqtt.onData(dataCB);
+    anto.mqtt.onPublished(publishedCB);
+    
+    // Connect to Anto.io MQTT broker
+    anto.mqtt.connect();
 }
 
 void loop() {
+    // wait for connection of broker
     delay(5000);
     ++value;
 
-    if (bIsConnected) { // If the connection is establised, publish the messages.
-        Serial.println("test");
-        Anto.pub("analog", (value % 2 == 0 ? "1234" : "5678"));
-        Anto.pub("Name", (value % 2 == 0 ? "Kohpai" : "Farm"));
-        Anto.pub("input", (value % 2 == 0 ? "1" : "0")); 
+    // If the connection is establised, publish the messages.
+    if (bIsConnected) { 
+        if (value % 2 == 0) {
+            // pub(channel, value, QOS, retain)
+            // where QOS is 0, 1, or 2
+            // and retain is true or false
+            anto.pub("analog", "1234", 1, true);
+
+            // default retain is false
+            anto.pub("name", "Kohpai", 2);
+
+            // default QOS is 0
+            anto.pub("input", "1", true); 
+        }
+        else {
+            anto.pub("analog", "5678", 0);
+            anto.pub("name", "Farm", 2, false);
+            anto.pub("input", "0", true); 
+        }
         
         Serial.println(value);
     }
-    else { // If disconnected from server, reconnect.
+    // If disconnected from server, reconnect.
+    else { 
         Serial.println("failed");
-        Anto.connect();
+        anto.mqtt.connect();
     }
 }
 
@@ -73,15 +101,18 @@ void loop() {
 */
 void connectedCB()
 {   
-    // If the connection is establised, subscribe channels.
-
     bIsConnected = true;
     Serial.println("Connected to MQTT Broker");
     
-    Anto.sub("analog");
-    Anto.sub("Name");
-    Anto.sub("input");
-    Anto.service("gas.91e10.price");
+    // If the connection is establised, subscribe channels
+    // by using sub(channel, QOS) 
+    // where QOS is 0, 1, or 2
+    anto.sub("analog", 1);
+    anto.sub("name", 2);
+
+    // default QOS is 0.
+    anto.sub("input");
+    anto.service("gas.91e10.price");
 }
 
 /*
@@ -94,9 +125,9 @@ void disconnectedCB()
 }
 
 /*
-* msgArrvCB(): a callback function called when there a message from the subscribed channel.
+* dataCB(): a callback function called when there a message from the subscribed channel.
 */
-void msgArrvCB(String& topic, String& msg)
+void dataCB(String& topic, String& msg)
 {
     Serial.print(topic);
     Serial.print(": ");

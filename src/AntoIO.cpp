@@ -1,46 +1,78 @@
+
 #include "json/ArduinoJson.h"
 #include "wifi/ESP8266WiFi.h"
 #include "AntoIO.h"
 
-//gas.91e10.price
+#define ANTO_VER    "v0.4.1"
+#define ANTO_HOST   "api.anto.io"
+#define ANTO_BROKER "service.anto.io"
+#define ANTO_GET    "/channel/get/"
+#define ANTO_SET    "/channel/set/"
+#define ANTO_BROKER_PORT 1883
+#define ANTO_RAND_STR_LEN 10
 
-AntoIO::AntoIO() : _host("api.anto.io"), _broker("service.anto.io"), _getParam("/channel/get/"),
-    _setParam("/channel/set/"), _myMqtt("client1", "service.anto.io", 1883) {}
+void gen_random(char *s, const int len);
+bool isResponseSuccess(String json);
+String responseFilter(String str);
 
-bool AntoIO::begin(char* ssid, char *passphrase, char* token, char* user, char* defaultThing)
+
+AntoIO::AntoIO(const char *user, const char *token, const char *thing, const char *client_id): 
+    mqtt(client_id, ANTO_BROKER, ANTO_BROKER_PORT), _user(user), _token(token), _thing(thing)
 {
-    return begin((const char*)ssid, (const char*)passphrase, (const char*)token, (const char*)user, (const char*)defaultThing);
+    String clientId(ANTO_VER);
+
+    clientId += '-';
+    clientId += user;
+    clientId += '-';
+
+    if (client_id[0] == 0) {
+        char randString[ANTO_RAND_STR_LEN + 1];
+
+        randomSeed(analogRead(0));
+        gen_random(randString, ANTO_RAND_STR_LEN);
+
+        clientId += randString;
+    }
+    else
+        clientId += client_id;
+
+    char buf[clientId.length() + 1];
+
+    clientId.toCharArray(buf, clientId.length() + 1);
+
+    mqtt.setClientId(buf);
+    mqtt.setUserPwd(user, token);
 }
 
-bool AntoIO::begin(const char* ssid, const char *passphrase, const char* token, const char *user, const char* defaultThing) 
+const char* AntoIO::getVersion(void)
+{
+    return ANTO_VER;
+}
+
+bool AntoIO::begin(const char* ssid, const char *passphrase) 
 {
     bool result = false;
     uint8_t count;
 
-    _myMqtt.setUserPwd(user, token);
-    _token = token;
-    _defaultThing = defaultThing;
-    _user = user;
-
     WiFi.begin(ssid, passphrase);
 
-    for (count = 10; count && (WiFi.status() != WL_CONNECTED); --count) delay(500);
+    for (count = 50; count && (WiFi.status() != WL_CONNECTED); --count) 
+        delay(100);
 
-    if (count) result = true;
-
-    connect();
+    if (count) 
+        result = true;
 
     return result;
 }
 
 bool AntoIO::digitalUpdate(const char* channel, bool value)
 {
-    return digitalUpdate(_defaultThing, channel, value);
+    return digitalUpdate(_thing, channel, value);
 }
 
 bool AntoIO::digitalUpdate(const char* thing, const char* channel, bool value)
 {
-    String str = requestHttp(_host, String(_setParam)+_token+"/"+thing+"/"+channel+"/"+(value ? "1":"0"));
+    String str = requestHttp(ANTO_HOST, String(ANTO_SET)+_token+"/"+thing+"/"+channel+"/"+(value ? "1":"0"));
 
     if (str.equals(""))
         return false;
@@ -52,48 +84,48 @@ bool AntoIO::digitalUpdate(const char* thing, const char* channel, bool value)
 }
 bool AntoIO::analogUpdate(const char* channel, int32_t value)
 {
-    return analogUpdate(_defaultThing, channel, value);
+    return analogUpdate(_thing, channel, value);
 }
 
 bool AntoIO::analogUpdate(const char* thing, const char* channel, int32_t value)
 {
-    String str = requestHttp(_host, String(_setParam)+_token+"/"+thing+"/"+channel+"/"+String(value));
+    String str = requestHttp(ANTO_HOST, String(ANTO_SET)+_token+"/"+thing+"/"+channel+"/"+String(value));
 
     if (str.equals(""))
         return false;
 
-    if (isResponseSuccess(str)) {
+    if (isResponseSuccess(str))
         return true;
-    }
-    else return false;
+    else
+        return false;
 }
 
 bool AntoIO::stringUpdate(const char* channel, const char* value)
 {
-    return stringUpdate(_defaultThing, channel, value);
+    return stringUpdate(_thing, channel, value);
 }
 
 bool AntoIO::stringUpdate(const char* thing, const char* channel, const char* value)
 {
-    String str = requestHttp(_host, String(_setParam)+_token+"/"+thing+"/"+channel+"/"+value);
+    String str = requestHttp(ANTO_HOST, String(ANTO_SET)+_token+"/"+thing+"/"+channel+"/"+value);
 
     if (str.equals(""))
         return false;
 
-    if (isResponseSuccess(str)) {
+    if (isResponseSuccess(str))
         return true;
-    }
-    else return false;
+    else
+        return false;
 }
 
 bool AntoIO::digitalGet(const char* channel)
 {
-    return digitalGet(_defaultThing, channel);
+    return digitalGet(_thing, channel);
 }
 
 bool AntoIO::digitalGet(const char* thing, const char* channel)
 {
-    String str = requestHttp(_host, String(_getParam)+_token+"/"+thing+"/"+channel);
+    String str = requestHttp(ANTO_HOST, String(ANTO_GET)+_token+"/"+thing+"/"+channel);
 
     if (str.equals(""))
         return false;
@@ -114,17 +146,18 @@ bool AntoIO::digitalGet(const char* thing, const char* channel)
 /* 
  * return real "FALSE", still thinking
  */
-    else return false;
+    else
+        return false;
 }
 
 int32_t AntoIO::analogGet(const char* channel)
 {
-    return analogGet(_defaultThing, channel);
+    return analogGet(_thing, channel);
 }
 
 int32_t AntoIO::analogGet(const char* thing, const char* channel)
 {
-    String str = requestHttp(_host, String(_getParam)+_token+"/"+thing+"/"+channel);
+    String str = requestHttp(ANTO_HOST, String(ANTO_GET)+_token+"/"+thing+"/"+channel);
 
     if (str.equals(""))
         return 0;
@@ -144,17 +177,18 @@ int32_t AntoIO::analogGet(const char* thing, const char* channel)
 /* 
  * return real "FALSE", still thinking
  */
-    else return 0;
+    else
+        return 0;
 }
 
 String AntoIO::stringGet(const char* channel)
 {
-    return stringGet(_defaultThing, channel);
+    return stringGet(_thing, channel);
 }
 
 String AntoIO::stringGet(const char* thing, const char* channel)
 {
-    String str = requestHttp(_host, String(_getParam)+_token+"/"+thing+"/"+channel);
+    String str = requestHttp(ANTO_HOST, String(ANTO_GET)+_token+"/"+thing+"/"+channel);
 
     if (str.equals(""))
         return str;
@@ -174,28 +208,8 @@ String AntoIO::stringGet(const char* thing, const char* channel)
 /* 
  * return real "FALSE", still thinking
  */
-    else "";
-}
-
-String AntoIO::responseFilter(String str)
-{
-    uint32_t index = str.indexOf('{');
-
-    str.remove(0, index);
-    
-    return str;
-}
-
-bool AntoIO::isResponseSuccess(String json)
-{
-    StaticJsonBuffer<200> jsonBuffer;
-
-    JsonObject& root = jsonBuffer.parseObject(json);
-
-    if (!root.success())
-        return false;
-    
-    return root["result"];
+    else
+        return "";
 }
 
 String AntoIO::requestHttp(const char *host, String arg) 
@@ -227,7 +241,7 @@ String AntoIO::requestHttp(const char *host, String arg)
 
 String AntoIO::request(const char *arg) 
 {
-    String str = requestHttp(_host, String("/request/") + _token + "/" + arg);
+    String str = requestHttp(ANTO_HOST, String("/request/") + _token + "/" + arg);
 
     if (str.equals(""))
         return str;
@@ -247,25 +261,16 @@ String AntoIO::request(const char *arg)
 /* 
  * return real "FALSE", still thinking
  */
-    else "";
+    else 
+        return "";
 }
 
-void AntoIO::connect(void)
+void AntoIO::pub(const char *channel, const char *msg, int qos, bool retain)
 {
-    _myMqtt.connect();
+    pub(_thing, channel, msg, qos, retain);
 }
 
-bool AntoIO::isConnected(void)
-{
-    return _myMqtt.isConnected();
-}
-
-void AntoIO::pub(const char *channel, const char *msg)
-{
-    pub(_defaultThing, channel, msg);
-}
-
-void AntoIO::pub(const char *thing, const char *channel, const char *msg)
+void AntoIO::pub(const char *thing, const char *channel, const char *msg, int qos, bool retain)
 {
     String topic("channel/");
     String message(msg);
@@ -276,42 +281,53 @@ void AntoIO::pub(const char *thing, const char *channel, const char *msg)
     topic += "/";
     topic += channel;
 
-    _myMqtt.publish(topic, message);
+    mqtt.publish(topic, message, qos, (retain ? 1:0));
 }
 
-void AntoIO::sub(const char *channel)
+void AntoIO::sub(const char *channel, int qos)
 {
-    sub(_defaultThing, channel);
+    sub(_thing, channel, qos);
 }
 
-void AntoIO::sub(const char *thing, const char *channel)
+void AntoIO::sub(const char *thing, const char *channel, int qos)
 {
-    _myMqtt.subscribe(String("channel/")+_user+"/"+thing+"/"+channel);
+    mqtt.subscribe(String("channel/")+_user+"/"+thing+"/"+channel, qos);
 }
 
-void AntoIO::service(const char *name)
+void AntoIO::service(const char *name, int qos)
 {
-    _myMqtt.subscribe(String("service/")+ name);
+    mqtt.subscribe(String("service/")+ name, qos);
 }
 
-void AntoIO::onMsgArrv(void (*function)(String&, String&))
+String responseFilter(String str)
 {
-    _myMqtt.onData(function);
+    uint32_t index = str.indexOf('{');
+
+    str.remove(0, index);
+    
+    return str;
 }
 
-void AntoIO::onDisconnected(void (*function)(void))
+bool isResponseSuccess(String json)
 {
-    _myMqtt.onDisconnected(function);
+    StaticJsonBuffer<200> jsonBuffer;
+
+    JsonObject& root = jsonBuffer.parseObject(json);
+
+    if (!root.success())
+        return false;
+    
+    return root["result"];
 }
 
-void AntoIO::onConnected(void (*function)(void))
-{
-    _myMqtt.onConnected(function);
-}
+void gen_random(char *s, const int len) {
+    const char alphanum[] =
+        "0123456789"
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        "abcdefghijklmnopqrstuvwxyz";
 
-void AntoIO::onPublished(void (*function)(void))
-{
-    _myMqtt.onPublished(function);
-}
+    for (int i = 0; i < len; ++i)
+        s[i] = alphanum[random(300) % (sizeof(alphanum) - 1)];
 
-AntoIO Anto;
+    s[len] = 0;
+}

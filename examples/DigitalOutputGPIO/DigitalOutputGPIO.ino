@@ -13,31 +13,43 @@
 #define LED2 4  // D2
 #define LED3 0  // D3
 
-// change ssid and password to yours
-const char* ssid     = "your access point's ssid";
-const char* password = "your access point's password";
-
-// use demo token or change to your token
-const char* token = "79HFgUJcpQu2OIGhZeMwXR1arybqv3SAfmnkYjoK";
-// use demo thing or change to your thing
-const char* thing = "smart_plug";
-// use demo username or change to your username
+// username of anto.io account
 const char *user = "WHCWHC78";
 
+// key of permission, generated on control panel anto.io
+const char* key = "Y9hHIBjdwPEOZo6c7SafNiz3X0snuJLRTFqgDKrU";
+
+// your default thing.
+const char* thing = "weather_station";
+
+// create AntoIO object named anto.
+// using constructor AntoIO(user, key, thing)
+// or use AntoIO(user, key, thing, clientId)
+// to generate client_id yourself.
+AntoIO anto(user, key, thing);
+
+int value = 0;
+
 void setup() {
+    // SSID and Password of your WiFi access point.
+    const char* ssid = "ssid";
+    const char* pwd  = "pwd";
+
     Serial.begin(115200);
     delay(10);
 
-    // We start by connecting to a WiFi network
-
     Serial.println();
     Serial.println();
+    Serial.print("Anto library version: ");
+    Serial.println(anto.getVersion());
     Serial.print("Connecting to ");
     Serial.println(ssid);
-    
-    if (!Anto.begin(ssid, password, token, user, thing)) {
+
+    // Connect to your WiFi access point
+    if (!anto.begin(ssid, pwd)) {
         Serial.println("Connection failed!!");
 
+        // Stop everything.
         while (1);
     }
 
@@ -50,52 +62,32 @@ void setup() {
     pinMode(LED3, OUTPUT);
 }
 
-int value = 0;
-
 void loop() {
+    delay(5000);
     ++value;
 
     bool var = LOW;
 
-/*Get 'out0' channel*/
-    var = Anto.digitalGet("out0");
-    
+    var = anto.digitalGet("smartPlug01");
     digitalWrite(LED0, var);
+    Serial.print("LED0: ");
+    Serial.println(var);
 
-    if (var == LOW)
-        Serial.println("out0: LOW");
-    else
-        Serial.println("out0: HIGH");
-
-/*Get 'out1' channel*/
-    var = Anto.digitalGet("out1");
-
+    var = anto.digitalGet("smartPlug02");
     digitalWrite(LED1, var);
+    Serial.print("LED1: ");
+    Serial.println(var);
 
-    if (var == LOW)
-        Serial.println("out1: LOW");
-    else
-        Serial.println("out1: HIGH");
-
-/*Get 'out2' channel*/
-    var = Anto.digitalGet("out2");
-
+    var = anto.digitalGet("smartPlug03");
     digitalWrite(LED2, var);
+    Serial.print("LED2: ");
+    Serial.println(var);
 
-    if (var == LOW)
-        Serial.println("out2: LOW");
-    else
-        Serial.println("out2: HIGH");
-    
-/*Get 'out3' channel*/
-    var = Anto.digitalGet("out3");
-
+    var = anto.digitalGet("smartPlug04");
     digitalWrite(LED3, var);
+    Serial.print("LED3: ");
+    Serial.println(var);
 
-    if (var == LOW)
-        Serial.println("out3: LOW");
-    else
-        Serial.println("out3: HIGH");
 
     Serial.println(value);
 }

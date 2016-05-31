@@ -7,31 +7,43 @@
 
 #include <AntoIO.h>
 
-// change ssid and password to yours
-const char* ssid     = "your access point's ssid";
-const char* password = "your access point's password";
-
-// use demo token or change to your token
-const char* token = "Y9hHIBjdwPEOZo6c7SafNiz3X0snuJLRTFqgDKrU";
-// use demo thing or change to your thing
-const char* thing = "weather_station";
-// use demo username or change to your username
+// username of anto.io account
 const char *user = "WHCWHC78";
 
+// key of permission, generated on control panel anto.io
+const char* key = "Y9hHIBjdwPEOZo6c7SafNiz3X0snuJLRTFqgDKrU";
+
+// your default thing.
+const char* thing = "weather_station";
+
+// create AntoIO object named anto.
+// using constructor AntoIO(user, key, thing)
+// or use AntoIO(user, key, thing, clientId)
+// to generate client_id yourself.
+AntoIO anto(user, key, thing);
+
+int value = 0;
+
 void setup() {
+    // SSID and Password of your WiFi access point.
+    const char* ssid = "ssid";
+    const char* pwd  = "pwd";
+
     Serial.begin(115200);
     delay(10);
 
-    // We start by connecting to a WiFi network
-
     Serial.println();
     Serial.println();
+    Serial.print("Anto library version: ");
+    Serial.println(anto.getVersion());
     Serial.print("Connecting to ");
     Serial.println(ssid);
-    
-    if (!Anto.begin(ssid, password, token, user, thing)) {
+
+    // Connect to your WiFi access point
+    if (!anto.begin(ssid, pwd)) {
         Serial.println("Connection failed!!");
 
+        // Stop everything.
         while (1);
     }
 
@@ -39,42 +51,33 @@ void setup() {
     Serial.println("WiFi connected");  
 }
 
-int value = 0;
-
 void loop() {
     delay(5000);
     ++value;
 
-// if value is even then change 'input' channel to LOW and 'analog' channel to 1234.
-// if value is odd then change 'input' channel to HIGH and 'analog' channel to 5678
+    if (value % 2 == 0) {
 
-    if ((value%2 == 0? Anto.digitalUpdate("input", LOW): Anto.digitalUpdate("input", HIGH))) {
-        Serial.println("Digital updating success");
+        // Update the channels value
+        anto.digitalUpdate("input", LOW);
+        anto.analogUpdate("analog", 1234);
+        anto.stringUpdate("name", "kohpai");
     }
-    else Serial.println("Digital updating failed");
-
-    if ((value%2 == 0? Anto.analogUpdate("analog", 1234): Anto.analogUpdate("analog", 5678))) {
-        Serial.println("analog updating success");
+    else {
+        anto.digitalUpdate("input", HIGH);
+        anto.analogUpdate("analog", 5678);
+        anto.stringUpdate("name", "farm");
     }
-    else Serial.println("analog updating failed");
-
-    if ((value%2 == 0? Anto.stringUpdate("Name", "kohpai"): Anto.stringUpdate("Name", "farm"))) {
-        Serial.println("string updating success");
-    }
-    else Serial.println("string updating failed");
 
     Serial.print("Digital: ");
 
-// get 'input' channel
-    Serial.println((Anto.digitalGet("input")? "HIGH":"LOW"));
+    // Get the channels value
+    Serial.println((anto.digitalGet("input")));
+
     Serial.print("Analog: ");
+    Serial.println(anto.analogGet("analog"));
 
-// get 'analog' channel
-    Serial.println(Anto.analogGet("analog"));
     Serial.print("String: ");
-
-// get 'Name' channel
-    Serial.println(Anto.stringGet("Name"));
+    Serial.println(anto.stringGet("Name"));
 
     Serial.println(value);
 
