@@ -1,6 +1,5 @@
 
 #include "json/ArduinoJson.h"
-#include "wifi/ESP8266WiFi.h"
 #include "AntoIO.h"
 
 #define ANTO_VER    "v0.4.1"
@@ -47,6 +46,14 @@ AntoIO::AntoIO(const char *user, const char *token, const char *thing, const cha
 const char* AntoIO::getVersion(void)
 {
     return ANTO_VER;
+}
+
+bool AntoIO::smartConfig (void)
+{
+    wifiManager.setDebugOutput(false);
+    wifiManager.autoConnect("Anto Smart Config");
+    
+    return true;
 }
 
 bool AntoIO::begin(const char* ssid, const char *passphrase) 

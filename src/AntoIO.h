@@ -8,6 +8,11 @@
 #ifndef ANTO_IO_H
 #define ANTO_IO_H
 
+#include <DNSServer.h>
+#include <ESP8266WiFi.h>
+#include <ESP8266WebServer.h>
+#include <wifimanager/WiFiManager.h>
+
 #include "mqtt/MQTT.h"
 
 class AntoIO
@@ -19,6 +24,7 @@ public:
     MQTT mqtt;
 
     bool 
+        smartConfig(void),
         begin(const char* ssid, const char *passphrase),
 
         digitalUpdate(const char* channel, bool value),
@@ -56,6 +62,8 @@ public:
         service(const char *name, int qos = 0);
 
 private:
+    WiFiManager wifiManager;
+
     const char
         *_user,
         *_token,
