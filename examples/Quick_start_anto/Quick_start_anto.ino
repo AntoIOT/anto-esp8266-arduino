@@ -1,4 +1,3 @@
-
 #include <AntoIO.h>
 
 // username of anto.io account
@@ -17,21 +16,24 @@ const char* thing = "NodeMCU";
 AntoIO anto(user, key, thing);
 
 bool bIsConnected = false;
+
 int Led1,Led2,Led3 = 0;
-int motor = 0;
+int value = 0;
+
 
 void setup() {
     // SSID and Password of your WiFi access point.
     const char* ssid = "ssid";
-    const char* pwd  = "pwd";
-
+    const char* pwd  = "pass";
+  
     Serial.begin(115200);
     delay(10);
 
     Serial.println();
     Serial.println();
-    Serial.print("Connecting to ");
-    Serial.println(ssid);
+    Serial.print("Anto library version: ");
+    Serial.println(anto.getVersion());
+
 
     // Connect to your WiFi access point
     if (!anto.begin(ssid, pwd)) {
@@ -53,19 +55,16 @@ void setup() {
     
     // Connect to Anto.io MQTT broker
     anto.mqtt.connect();
-  
+
     //port output
+  //pinMode(D0,OUTPUT);
     pinMode(D1,OUTPUT);
     pinMode(D2,OUTPUT);
     pinMode(D3,OUTPUT);
 }
 
 void loop() {
-    // if disconnected from broker, try to reconnect.
-    if (!bIsConnected) {
-        anto.mqtt.connect();
-        delay(5000);
-    }
+  // put your main code here, to run repeatedly:
 }
 
 /*
@@ -73,12 +72,11 @@ void loop() {
 */
 void connectedCB()
 {   
+    // If the connection is establised, subscribe channels.
+
     bIsConnected = true;
     Serial.println("Connected to MQTT Broker");
     
-    // If the connection is establised, subscribe channels
-    // by using sub(channel, QOS) 
-    // where QOS is 0, 1, or 2
     anto.sub("LED1");
     anto.sub("LED2");
     anto.sub("LED3");
@@ -90,11 +88,11 @@ void connectedCB()
 void disconnectedCB()
 {   
     bIsConnected = false;
-    Serial.println("Disconnected from MQTT Broker");
+    Serial.println("Disconnected to MQTT Broker");
 }
 
 /*
-* dataCB(): a callback function called when there a message from the subscribed channel.
+* msgArrvCB(): a callback function called when there a message from the subscribed channel.
 */
 void dataCB(String& topic, String& msg)
 {
@@ -110,8 +108,8 @@ void dataCB(String& topic, String& msg)
     Serial.println(msg);
 
     if(topic.equals("LED1")){
-      motor = msg.toInt();
-      if(motor == 1){
+      value = msg.toInt();
+      if(value == 1){
         digitalWrite(D1,HIGH);
       }
       else{
@@ -120,8 +118,8 @@ void dataCB(String& topic, String& msg)
       
     }
     else if(topic.equals("LED2")){
-     motor = msg.toInt();
-     if(motor == 1){
+     value = msg.toInt();
+     if(value == 1){
         digitalWrite(D2,HIGH);
       }
       else{
@@ -129,8 +127,8 @@ void dataCB(String& topic, String& msg)
       }
     }
     else if(topic.equals("LED3")){
-      motor = msg.toInt();
-      if(motor == 1){
+      value = msg.toInt();
+      if(value == 1){
         digitalWrite(D3,HIGH);
       }
       else{
@@ -146,7 +144,6 @@ void publishedCB(void)
 {
     Serial.println("published");
 }
-
 
 
 
