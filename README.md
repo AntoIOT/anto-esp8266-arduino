@@ -1,3 +1,5 @@
-# Anto client library for ESP8266-Arduino
-## Stable version
+## Anto client library for ESP8266-Arduino
+### Stable version
 0.5.0
+### Quick start
+<https://antoiot.gitbooks.io/th-doc/content/index.html>
