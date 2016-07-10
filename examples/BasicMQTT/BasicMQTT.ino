@@ -27,8 +27,8 @@ bool bIsConnected = false;
 
 void setup() {
     // SSID and Password of your WiFi access point.
-    const char* ssid = "ssid";
-    const char* pwd  = "pwd";
+    const char* ssid = "AndroidAP";
+    const char* pwd  = "12345678";
 
     Serial.begin(115200);
     delay(10);
@@ -68,23 +68,43 @@ void loop() {
     ++value;
 
     // If the connection is establised, publish the messages.
-    if (bIsConnected) { 
+    if (bIsConnected) {
+        // String form of topic: name
+        String sname("name");
+
+        // String form of message: kohpai
+        String smsg("kohpai");
+
+        // String form of topic: analog
+        String sanalog("analog");
+
+        // String form of topic: input
+        String sinput("input");
+        
         if (value % 2 == 0) {
             // pub(channel, value, QOS, retain)
             // where QOS is 0, 1, or 2
             // and retain is true or false
             anto.pub("analog", "1234", 1, true);
 
+            // publish message in String form
             // default retain is false
-            anto.pub("name", "Kohpai", 2);
+            anto.pub(sname, smsg, 2);
 
             // default QOS is 0
-            anto.pub("input", "1", true); 
+            anto.pub("input", 1, true); 
         }
         else {
-            anto.pub("analog", "5678", 0);
-            anto.pub("name", "Farm", 2, false);
-            anto.pub("input", "0", true); 
+            // publish message in integer form.
+            // equals to anto.pub("analog", "5678", 0)
+            anto.pub(sanalog, 5678, 0);
+
+            // equals to anto.pub("name", "Farm", 2, false)
+            anto.pub(sname, "Farm", 2, false);
+
+            // publish message in character form.
+            // equals to anto.pub("input", "0", true);
+            anto.pub(sinput, '0', true); 
         }
         
         Serial.println(value);

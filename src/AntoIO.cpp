@@ -15,8 +15,10 @@ bool isResponseSuccess(String json);
 String responseFilter(String str);
 
 
-AntoIO::AntoIO(const char *user, const char *token, const char *thing, const char *client_id): 
-    mqtt(client_id, ANTO_BROKER, ANTO_BROKER_PORT), _user(user), _token(token), _thing(thing)
+AntoIO::AntoIO(const char *user, const char *token, 
+        const char *thing, const char *client_id): 
+    mqtt(client_id, ANTO_BROKER, ANTO_BROKER_PORT), 
+    _user(user), _token(token), _thing(thing)
 {
     String clientId(ANTO_VER);
 
@@ -195,7 +197,8 @@ String AntoIO::stringGet(const char* channel)
 
 String AntoIO::stringGet(const char* thing, const char* channel)
 {
-    String str = requestHttp(ANTO_HOST, String(ANTO_GET)+_token+"/"+thing+"/"+channel);
+    String str = requestHttp(ANTO_HOST, String(ANTO_GET) + _token 
+            + "/" + thing + "/" + channel);
 
     if (str.equals(""))
         return str;
@@ -248,7 +251,8 @@ String AntoIO::requestHttp(const char *host, String arg)
 
 String AntoIO::request(const char *arg) 
 {
-    String str = requestHttp(ANTO_HOST, String("/request/") + _token + "/" + arg);
+    String str = requestHttp(ANTO_HOST, String("/request/") 
+            + _token + "/" + arg);
 
     if (str.equals(""))
         return str;
@@ -272,12 +276,69 @@ String AntoIO::request(const char *arg)
         return "";
 }
 
-void AntoIO::pub(const char *channel, const char *msg, int qos, bool retain)
+void AntoIO::pub(const char *channel, const char *msg, 
+        int qos, bool retain)
 {
     pub(_thing, channel, msg, qos, retain);
 }
 
-void AntoIO::pub(const char *thing, const char *channel, const char *msg, int qos, bool retain)
+void AntoIO::pub(String& channel, String& msg, 
+        int qos, bool retain)
+{
+    pub(_thing, channel, msg, qos, retain);
+}
+
+void AntoIO::pub(const char *channel, String& msg, 
+        int qos, bool retain)
+{
+    String ch(channel);
+
+    pub(_thing, ch, msg, qos, retain);
+}
+
+void AntoIO::pub(String& channel, const char *msg, 
+        int qos, bool retain)
+{
+    String m(msg);
+
+    pub(_thing, channel, m, qos, retain);
+}
+
+void AntoIO::pub(const char *channel, int msg, 
+        int qos, bool retain)
+{
+    String m(msg);
+    String ch(channel);
+
+    pub(_thing, ch, m, qos, retain);
+}
+
+void AntoIO::pub(String& channel, int msg, 
+        int qos, bool retain)
+{
+    String m(msg);
+
+    pub(_thing, channel, m, qos, retain);
+}
+
+void AntoIO::pub(const char *channel, char msg, 
+        int qos, bool retain)
+{
+    const char m = msg;
+
+    pub(_thing, channel, &m, qos, retain);
+}
+
+void AntoIO::pub(String& channel, char msg, 
+        int qos, bool retain)
+{
+    String m(msg);
+
+    pub(_thing, channel, m, qos, retain);
+}
+
+void AntoIO::pub(const char *thing, const char *channel, const char *msg, 
+        int qos, bool retain)
 {
     String topic("channel/");
     String message(msg);
@@ -289,6 +350,20 @@ void AntoIO::pub(const char *thing, const char *channel, const char *msg, int qo
     topic += channel;
 
     mqtt.publish(topic, message, qos, (retain ? 1:0));
+}
+
+void AntoIO::pub(const char *thing, String& channel, String& msg, 
+        int qos, bool retain)
+{
+    String topic("channel/");
+
+    topic += _user;
+    topic += "/";
+    topic += thing;
+    topic += "/";
+    topic += channel;
+
+    mqtt.publish(topic, msg, qos, (retain ? 1:0));
 }
 
 void AntoIO::sub(const char *channel, int qos)

@@ -53,8 +53,26 @@ public:
         request(const char *arg);
 
     void 
-        pub(const char *channel, const char *msg, int qos = 0, bool retain = false),
-        pub(const char *thing, const char *channel, const char *msg, int qos = 0, bool retain = false),
+        pub(const char *channel, const char *msg, 
+                int qos = 0, bool retain = false),
+	    pub(String& channel, String& msg, 
+                int qos = 0, bool retain = false),
+        pub(const char *channel, String& msg, 
+                int qos = 0, bool retain = false),
+	    pub(String& channel, const char *msg, 
+                int qos = 0, bool retain = false),
+        pub(const char *channel, int msg, 
+                int qos = 0, bool retain = false),
+	    pub(String& channel, int msg, 
+                int qos = 0, bool retain = false),
+        pub(const char *channel, char msg, 
+                int qos = 0, bool retain = false),
+	    pub(String& channel, char msg, 
+                int qos = 0, bool retain = false),
+        pub(const char *thing, const char *channel, const char *msg, 
+                int qos = 0, bool retain = false),
+        pub(const char *thing, String& channel, String& msg, 
+                int qos = 0, bool retain = false),
 
         sub(const char *channel, int qos = 0),
         sub(const char *thing, const char *channel, int qos = 0),
