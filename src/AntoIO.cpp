@@ -81,7 +81,8 @@ bool AntoIO::digitalUpdate(const char* channel, bool value)
 
 bool AntoIO::digitalUpdate(const char* thing, const char* channel, bool value)
 {
-    String str = requestHttp(ANTO_HOST, String(ANTO_SET)+_token+"/"+thing+"/"+channel+"/"+(value ? "1":"0"));
+    String str = requestHttp(ANTO_HOST, String(ANTO_SET) + _token+ "/" + 
+            thing+ "/" + channel + "/" + (value ? "1" : "0"));
 
     if (str.equals(""))
         return false;
@@ -98,7 +99,8 @@ bool AntoIO::analogUpdate(const char* channel, int32_t value)
 
 bool AntoIO::analogUpdate(const char* thing, const char* channel, int32_t value)
 {
-    String str = requestHttp(ANTO_HOST, String(ANTO_SET)+_token+"/"+thing+"/"+channel+"/"+String(value));
+    String str = requestHttp(ANTO_HOST, String(ANTO_SET) + _token + "/" + 
+            thing + "/" + channel + "/" + String(value));
 
     if (str.equals(""))
         return false;
@@ -114,9 +116,11 @@ bool AntoIO::stringUpdate(const char* channel, const char* value)
     return stringUpdate(_thing, channel, value);
 }
 
-bool AntoIO::stringUpdate(const char* thing, const char* channel, const char* value)
+bool AntoIO::stringUpdate(const char* thing, const char* channel, 
+        const char* value)
 {
-    String str = requestHttp(ANTO_HOST, String(ANTO_SET)+_token+"/"+thing+"/"+channel+"/"+value);
+    String str = requestHttp(ANTO_HOST, String(ANTO_SET) + _token + "/" +
+            thing + "/" + channel + "/" + value);
 
     if (str.equals(""))
         return false;
@@ -134,7 +138,8 @@ bool AntoIO::digitalGet(const char* channel)
 
 bool AntoIO::digitalGet(const char* thing, const char* channel)
 {
-    String str = requestHttp(ANTO_HOST, String(ANTO_GET)+_token+"/"+thing+"/"+channel);
+    String str = requestHttp(ANTO_HOST, String(ANTO_GET) + _token + "/" +
+            thing + "/" + channel);
 
     if (str.equals(""))
         return false;
@@ -166,7 +171,8 @@ int32_t AntoIO::analogGet(const char* channel)
 
 int32_t AntoIO::analogGet(const char* thing, const char* channel)
 {
-    String str = requestHttp(ANTO_HOST, String(ANTO_GET)+_token+"/"+thing+"/"+channel);
+    String str = requestHttp(ANTO_HOST, String(ANTO_GET) + _token + "/" + 
+            thing + "/" + channel);
 
     if (str.equals(""))
         return 0;
@@ -331,6 +337,21 @@ void AntoIO::pub(const char *channel, char msg,
 
 void AntoIO::pub(String& channel, char msg, 
         int qos, bool retain)
+{
+    String m(msg);
+
+    pub(_thing, channel, m, qos, retain);
+}
+        
+void AntoIO::pub(const char *channel, double msg, int qos, bool retain)
+{
+    String m(msg);
+    String ch(channel);
+
+    pub(_thing, ch, m, qos, retain);
+}
+	    
+void AntoIO::pub(String& channel, double msg, int qos, bool retain)
 {
     String m(msg);
 
