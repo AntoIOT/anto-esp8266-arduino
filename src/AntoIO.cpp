@@ -2,7 +2,7 @@
 #include "json/ArduinoJson.h"
 #include "AntoIO.h"
 
-#define ANTO_VER    "v0.5.0"
+#define ANTO_VER    "v0.5.2"
 #define ANTO_HOST   "api.anto.io"
 #define ANTO_BROKER "service.anto.io"
 #define ANTO_GET    "/channel/get/"
