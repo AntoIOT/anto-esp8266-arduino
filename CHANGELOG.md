@@ -1,3 +1,6 @@
+## 0.5.2 (2016-06-16)
+* Add new overload methods for AntoIO::pub() (Integer, String, Character and Floating point)
+* Edit example BasicMQTT
 ## 0.5.0 (2016-06-16)
 * Add WiFi Manager (Smart config)
 * Add example read temperature and humidity from DHT11 and send to server
