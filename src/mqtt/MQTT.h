@@ -68,6 +68,7 @@ public:
 	void onDisconnected( void (*)(void) );
 	void onPublished( void (*)(void) );
 	void onData( void (*)(String&, String&) );
+	void onData( void (*)(String&, String&, String&) );
 	void onData( void (*)(const char*, uint32_t, const char*, uint32_t) );
 	
 	// user callbacks
@@ -75,6 +76,7 @@ public:
 	void (*onMqttDisconnectedCb)(void);
 	void (*onMqttPublishedCb)(void);
 	void (*onMqttDataCb) (String&, String&);
+	void (*onMqttDataSplitCb) (String&, String&, String&);
 	void (*onMqttDataRawCb) (const char*, uint32_t, const char*, uint32_t);
 	
 	// internal callback

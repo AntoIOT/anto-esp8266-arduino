@@ -81,6 +81,39 @@ bool AntoIO::begin(const char* ssid, const char *passphrase)
     return result;
 }
 
+void AntoIO::connectMQTT()
+{
+	mqtt.connect();
+}
+
+void AntoIO::on(const char* eventName, void (* callback)(String& thing, String& channel, String& msg))
+{
+	if (strcmp(eventName,"dataReceived") == 0) {
+		cb_onDataReceived = callback;
+		mqtt.onData(cb_onDataReceived);
+	} else {
+		Serial.print("Error when register callback : ");
+		Serial.println(eventName);
+	}
+}
+
+void AntoIO::on(const char* eventName, void (* callback)(void))
+{
+	if (strcmp(eventName,"connected") == 0) {
+		cb_onConnected = callback;
+		mqtt.onConnected(cb_onConnected);
+	} else if (strcmp(eventName,"disconnected") == 0) {
+		cb_onDisconnected = callback;
+		mqtt.onDisconnected(cb_onDisconnected);
+	} else if (strcmp(eventName,"published") == 0) {
+		cb_onPublished = callback;
+		mqtt.onPublished(cb_onPublished);
+	} else {
+		Serial.print("Error when register callback : ");
+		Serial.println(eventName);
+	}
+}
+
 bool AntoIO::digitalUpdate(const char* channel, bool value)
 {
     return digitalUpdate(_thing, channel, value);

@@ -52,6 +52,7 @@ public:
 
     void
 		showVersion(void),
+		connectMQTT(void),
         pub(const char *channel, const char *msg, 
                 int qos = 0, bool retain = false),
 	    pub(String& channel, String& msg, 
@@ -81,7 +82,11 @@ public:
         sub(const char *thing, const char *channel, int qos = 0),
 
         service(const char *name, int qos = 0); // Deprecated
-
+	
+	void
+		on(const char* eventName, void (* callback)(String& thing, String& channel, String& msg)),
+		on(const char* eventName, void (* callback)(void));
+		
 private:
     WiFiManager wifiManager;
 
@@ -89,6 +94,11 @@ private:
         *_user,
         *_token,
         *_thing;
+		
+	void (*cb_onDataReceived)(String& thing, String& channel, String& msg);
+	void (*cb_onConnected)(void);
+	void (*cb_onDisconnected)(void);
+	void (*cb_onPublished)(void);
 };
 
 #endif

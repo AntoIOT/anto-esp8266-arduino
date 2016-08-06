@@ -1,136 +1,90 @@
+/*
+ * This is the example of using Anto.io library to 
+ * Send DHT sensor value to the internet via Anto
+ */
 #include <AntoIO.h>
 #include <DHT.h>
 
-// username of anto.io account
-const char *user = "thefarmer";
+// WiFi name and Password of your WiFi access point
+const char* wifi_name = "";
+const char* wifi_password  = "";
 
-// key of permission, generated on control panel anto.io
-const char* key = "key";
+// Username of Anto.io account
+const char *username = "";
 
-// your default thing.
-const char* thing = "Node_DHT";
+// Key to access and control your channels, generated on Anto.io control panel
+const char* key = "";
 
-// create AntoIO object named anto.
-// using constructor AntoIO(user, key, thing)
-// or use AntoIO(user, key, thing, clientId)
-// to generate client_id yourself.
-AntoIO anto(user, key, thing);
+// Thing name
+const char* thing = "";
+
+// Global variable
+AntoIO anto(username, key, thing);
 
 bool bIsConnected = false;
 
-String Antosend;
-char buf[5];
-
-#define DHTPIN 2    //port D4
-#define DHTTYPE DHT11
-DHT dht(DHTPIN,DHTTYPE);
-
 void setup() {
-    Serial.begin(115200);
+	Serial.begin(115200);
     delay(10);
-
-    Serial.println();
-    Serial.println();
-    Serial.print("Anto library version: ");
-    Serial.println(anto.getVersion());
-
+    anto.showVersion();
 
     // Connect to your WiFi access point
-    anto.smartConfig();
-
-    Serial.println();
+    if (!anto.begin(wifi_name, wifi_password)) {
+        Serial.println("Failed to connect to WiFi!");
+        while (1); // Stop everything
+    }
     Serial.println("WiFi connected");  
     Serial.println("Connecting to MQTT broker");
-    
-    // register callback functions
-    anto.mqtt.onConnected(connectedCB);
-    anto.mqtt.onDisconnected(disconnectedCB);
-    anto.mqtt.onData(dataCB);
-    anto.mqtt.onPublished(publishedCB);
-    
-    // Connect to Anto.io MQTT broker
-    anto.mqtt.connect();
+	
+	// register MQTT callback functions
+	anto.on("connected", onConnectedFunc);
+	anto.on("disconnected", onDisconnectedFunc);
+	anto.connectMQTT(); // Connect to Anto MQTT broker
 
-    //dht start
+    // start dht sensor
     dht.begin();
 }
 
-
 void loop() {
-  // put your main code here, to run repeatedly:
-   float temp = dht.readTemperature();
-   float humid = dht.readHumidity();
-   
-   Serial.print("TEMP: ");
-   Serial.println(temp);
-
-   Serial.print("HUMID: ");
-   Serial.println(humid);  
-   
-
-   if(temp >= 0){
-      Antosend = String(temp);                     //แปลง temp เป็น string
-      Antosend.toCharArray(buf,Antosend.length()); //string ยัดใส่ buf
-      anto.pub("Temp",(const char*)buf);           //ใช้ buf ส่งค่าขึ้นไป
-   }
-
-   if(humid >= 0){
-      Antosend = String(humid);
-      Antosend.toCharArray(buf,Antosend.length());
-      anto.pub("Humid",(const char*)buf);
-   }
-
-  delay(1000);
+	// put your main code here, to run repeatedly:
+	
+	if (bIsConnected) // Check is connected to server ?
+	{
+		float temp = dht.readTemperature();
+		float humid = dht.readHumidity();
+		
+		Serial.print("TEMP: ");
+		Serial.println(temp);
+		
+		Serial.print("HUMID: ");
+		Serial.println(humid);  
+		
+		if (temp >= 0) {
+			anto.pub("Temp", temp); // send temperature value to server
+		}
+		
+		if (humid >= 0) {
+			anto.pub("Humid", humid); // send humidity value to server
+		}
+		
+		delay(2000);
+	}
 }
 
 /*
-* connectedCB(): a callback function called when the connection to the MQTT broker is establised.
+* onConnectedFunc(): a callback function called when the connection to the MQTT broker is established.
 */
-void connectedCB()
+void onConnectedFunc()
 {   
-    // If the connection is establised, subscribe channels.
-
     bIsConnected = true;
-    Serial.println("Connected to MQTT Broker");
-    
+    Serial.println("Connected to Anto MQTT Broker");
 }
 
 /*
-* disconnectedCB(): a callback function called when the connection to the MQTT broker is broken.
+* onDisconnectedFunc(): a callback function called when the connection to the MQTT broker is broken.
 */
-void disconnectedCB()
+void onDisconnectedFunc()
 {   
     bIsConnected = false;
-    Serial.println("Disconnected to MQTT Broker");
+    Serial.println("Disconnected from Anto MQTT Broker");
 }
-
-/*
-* msgArrvCB(): a callback function called when there a message from the subscribed channel.
-*/
-void dataCB(String& topic, String& msg)
-{
-    uint8_t index = topic.indexOf('/');
-
-    index = topic.indexOf('/', index + 1);
-    index = topic.indexOf('/', index + 1);
-
-    topic.remove(0, index + 1);
-   
-    Serial.print(topic);
-    Serial.print(": ");
-    Serial.println(msg);
-
-}
-
-/*
-* publishedCB(): a callback function called when the message is published.
-*/
-void publishedCB(void)
-{
-    Serial.println("published");
-}
-
-
-
-
-

@@ -217,6 +217,11 @@ void MQTT::onData( void (*function)(String&, String&) )
 	onMqttDataCb = function;
 }
 
+void MQTT::onData( void (*function)(String&, String&, String&) )
+{
+	onMqttDataSplitCb = function;
+}
+
 void MQTT::onData( void (*function)(const char*, uint32_t, const char*, uint32_t) )
 {
 	onMqttDataRawCb = function;
@@ -230,7 +235,7 @@ void MQTT::_onMqttDataCb(const char* topic, uint32_t topic_len, const char* buf,
 		onMqttDataRawCb(topic, topic_len, buf, buf_len);
 	}
 	
-	if (onMqttDataCb) {
+	if (onMqttDataCb || onMqttDataSplitCb) {
 		
 		char* topicCpy = (char*)malloc(topic_len+1);
 		memcpy(topicCpy, topic, topic_len);
@@ -244,18 +249,20 @@ void MQTT::_onMqttDataCb(const char* topic, uint32_t topic_len, const char* buf,
 		// string it
 		String bufStr(bufCpy);
 		
-		onMqttDataCb(topicStr, bufStr);
+		if (onMqttDataSplitCb) {
+			String thing(topicStr);
+			String channel(topicStr);
+			uint8_t index1 = topicStr.indexOf('/');
+			uint8_t index2 = topicStr.indexOf('/', index1 + 1);
+			index1 = topicStr.indexOf('/', index2 + 1);
+			thing = thing.substring(index2+1, index1);
+			channel.remove(0, index1 + 1);
+			onMqttDataSplitCb(thing, channel, bufStr);
+		} else {
+			onMqttDataCb(topicStr, bufStr);
+		}
 		
 		free(topicCpy);
 		free(bufCpy);
 	}
 }
-
-
-
-
-
-
-
-
-

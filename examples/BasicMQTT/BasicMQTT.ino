@@ -1,65 +1,47 @@
 /*
- * This is the example of using AntoIO library to 
- * Update and get digital 'channel' from service.anto.io using MQTT.
- * 
- * by Anto.io
+ * This is the example of using Anto.io library to 
+ * Use basic function of MQTT protocol
  */
-
 #include <AntoIO.h>
 
-// username of anto.io account
-const char *user = "WHCWHC78";
+// WiFi name and Password of your WiFi access point
+const char* wifi_name = "";
+const char* wifi_password  = "";
 
-// key of permission, generated on control panel anto.io
-const char* key = "Y9hHIBjdwPEOZo6c7SafNiz3X0snuJLRTFqgDKrU";
+// Username of Anto.io account
+const char *username = "";
 
-// your default thing.
-const char* thing = "weather_station";
+// Key to access and control your channels, generated on Anto.io control panel
+const char* key = "";
 
-// create AntoIO object named anto.
-// using constructor AntoIO(user, key, thing)
-// or use AntoIO(user, key, thing, clientId)
-// to generate client_id yourself.
-AntoIO anto(user, key, thing);
+// Thing name
+const char* thing = "";
 
-int value = 0;
+// Global variable
+AntoIO anto(username, key, thing);
+
 bool bIsConnected = false;
+int value = 0;
 
 void setup() {
-    // SSID and Password of your WiFi access point.
-    const char* ssid = "AndroidAP";
-    const char* pwd  = "12345678";
-
     Serial.begin(115200);
     delay(10);
-
-    Serial.println();
-    Serial.println();
-    Serial.print("Anto library version: ");
-    Serial.println(anto.getVersion());
-    Serial.print("Connecting to ");
-    Serial.println(ssid);
+    anto.showVersion();
 
     // Connect to your WiFi access point
-    if (!anto.begin(ssid, pwd)) {
-        Serial.println("Connection failed!!");
-
-        // Stop everything.
-        while (1);
+    if (!anto.begin(wifi_name, wifi_password)) {
+        Serial.println("Failed to connect to WiFi!");
+        while (1); // Stop everything
     }
-
-    Serial.println();
     Serial.println("WiFi connected");  
     Serial.println("Connecting to MQTT broker");
     
-    // register callback functions
-    anto.mqtt.onConnected(connectedCB);
-    anto.mqtt.onDisconnected(disconnectedCB);
-    anto.mqtt.onData(dataCB);
-    anto.mqtt.onPublished(publishedCB);
-    
-    // Connect to Anto.io MQTT broker
-    anto.mqtt.connect();
+    // register MQTT callback functions
+	anto.on("connected", onConnectedFunc);
+	anto.on("disconnected", onDisconnectedFunc);
+	anto.on("dataReceived", onDataReceivedFunc);
+	anto.on("published", onPublishedFunc);
+    anto.connectMQTT(); // Connect to Anto MQTT broker
 }
 
 void loop() {
@@ -110,21 +92,20 @@ void loop() {
         Serial.println(value);
     }
     // If disconnected from server, reconnect.
-    else { 
-        Serial.println("failed");
-        anto.mqtt.connect();
+    else {
+        anto.connectMQTT();
     }
 }
 
 /*
-* connectedCB(): a callback function called when the connection to the MQTT broker is establised.
+* onConnectedFunc(): a callback function called when the connection to the MQTT broker is established.
 */
-void connectedCB()
+void onConnectedFunc()
 {   
     bIsConnected = true;
-    Serial.println("Connected to MQTT Broker");
+    Serial.println("Connected to Anto MQTT Broker");
     
-    // If the connection is establised, subscribe channels
+    // If the connection is established, subscribe channels
     // by using sub(channel, QOS) 
     // where QOS is 0, 1, or 2
     anto.sub("analog", 1);
@@ -132,32 +113,32 @@ void connectedCB()
 
     // default QOS is 0.
     anto.sub("input");
-    anto.service("gas.91e10.price");
 }
 
 /*
-* disconnectedCB(): a callback function called when the connection to the MQTT broker is broken.
+* onDisconnectedFunc(): a callback function called when the connection to the MQTT broker is broken.
 */
-void disconnectedCB()
+void onDisconnectedFunc()
 {   
     bIsConnected = false;
-    Serial.println("Disconnected to MQTT Broker");
+    Serial.println("Disconnected from Anto MQTT Broker");
 }
 
 /*
-* dataCB(): a callback function called when there a message from the subscribed channel.
+* onDataReceivedFunc(): a callback function called when received a message from the subscribed channel.
 */
-void dataCB(String& topic, String& msg)
+void onDataReceivedFunc(String& thing, String& channel, String& msg)
 {
-    Serial.print(topic);
-    Serial.print(": ");
+    Serial.println(thing);
+    Serial.println(channel);
     Serial.println(msg);
+    Serial.println();
 }
 
 /*
-* publishedCB(): a callback function called when the message is published.
+* onPublishedFunc(): a callback function called when the message is published.
 */
-void publishedCB(void)
+void onPublishedFunc()
 {
-    Serial.println("published");
+    Serial.println("Message is published");
 }
