@@ -1,10 +1,7 @@
 /*
  * Anto.io - The easiest ESP8266 library for Arduino IDE
- *
  * by Anto.io
- * 13/09/2015
 */
-
 #ifndef ANTO_IO_H
 #define ANTO_IO_H
 
@@ -50,9 +47,11 @@ public:
         stringGet(const char* thing,const char* channel),
 
         requestHttp(const char*, String arg),
-        request(const char *arg);
+        request(const char *arg), // Deprecated
+		getDataService(const char *arg);
 
-    void 
+    void
+		showVersion(void),
         pub(const char *channel, const char *msg, 
                 int qos = 0, bool retain = false),
 	    pub(String& channel, String& msg, 
@@ -81,7 +80,7 @@ public:
         sub(const char *channel, int qos = 0),
         sub(const char *thing, const char *channel, int qos = 0),
 
-        service(const char *name, int qos = 0);
+        service(const char *name, int qos = 0); // Deprecated
 
 private:
     WiFiManager wifiManager;

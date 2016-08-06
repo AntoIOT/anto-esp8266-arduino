@@ -1,4 +1,3 @@
-
 #include "json/ArduinoJson.h"
 #include "AntoIO.h"
 
@@ -50,11 +49,16 @@ const char* AntoIO::getVersion(void)
     return ANTO_VER;
 }
 
+void AntoIO::showVersion(void){
+	Serial.println();
+    Serial.print("Anto library version: ");
+    Serial.println(getVersion());
+}
+
 bool AntoIO::smartConfig (void)
 {
     wifiManager.setDebugOutput(false);
     wifiManager.autoConnect("Anto Smart Config");
-    
     return true;
 }
 
@@ -64,11 +68,14 @@ bool AntoIO::begin(const char* ssid, const char *passphrase)
     uint8_t count;
 
     WiFi.begin(ssid, passphrase);
+	Serial.print("WiFi connecting");
+    for (count = 10; count && (WiFi.status() != WL_CONNECTED); --count) {
+		Serial.print(".");
+        delay(500);
+	}
+	Serial.println();
 
-    for (count = 50; count && (WiFi.status() != WL_CONNECTED); --count) 
-        delay(100);
-
-    if (count) 
+    if(count)
         result = true;
 
     return result;
@@ -148,18 +155,11 @@ bool AntoIO::digitalGet(const char* thing, const char* channel)
 
     JsonObject& root = jsonBuffer.parseObject(str);
 
-/* 
- * return real "FALSE", still thinking
- */
     if (!root.success())
         return false;
     
     if (root["result"] == true)
         return (root["value"] == 1 ? true : false);
-
-/* 
- * return real "FALSE", still thinking
- */
     else
         return false;
 }
@@ -213,17 +213,11 @@ String AntoIO::stringGet(const char* thing, const char* channel)
 
     JsonObject& root = jsonBuffer.parseObject(str);
 
-/* 
- * return real "FALSE", still thinking
- */
     if (!root.success())
         return "";
     
     if (root["result"] == true)
         return root["value"];
-/* 
- * return real "FALSE", still thinking
- */
     else
         return "";
 }
@@ -255,7 +249,13 @@ String AntoIO::requestHttp(const char *host, String arg)
     return (str = responseFilter(str));
 }
 
-String AntoIO::request(const char *arg) 
+String AntoIO::request(const char *arg)
+{
+	Serial.println("Deprecated: request(): This function is deprecated and will be removed soon. use getDataService() instead");
+	getDataService(arg);
+}
+
+String AntoIO::getDataService(const char *arg)
 {
     String str = requestHttp(ANTO_HOST, String("/request/") 
             + _token + "/" + arg);
@@ -267,17 +267,11 @@ String AntoIO::request(const char *arg)
 
     JsonObject& root = jsonBuffer.parseObject(str);
 
-/* 
- * return real "FALSE", still thinking
- */
     if (!root.success())
         return "";
-    
+
     if (root["result"] == true)
         return root["value"];
-/* 
- * return real "FALSE", still thinking
- */
     else 
         return "";
 }
@@ -399,6 +393,7 @@ void AntoIO::sub(const char *thing, const char *channel, int qos)
 
 void AntoIO::service(const char *name, int qos)
 {
+	Serial.println("Deprecated: service(): This function is deprecated and will be removed soon. use getDataService() instead");
     mqtt.subscribe(String("service/")+ name, qos);
 }
 

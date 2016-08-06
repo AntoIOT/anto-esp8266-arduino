@@ -1,49 +1,39 @@
+/*
+ * This is the example of using Anto.io library to 
+ * Control 3 LED from the internet (Use MQTT protocol)
+ */
 #include <AntoIO.h>
 
-// username of anto.io account
-const char *user = "user";
+// WiFi name and Password of your WiFi access point
+const char* wifi_name = "";
+const char* wifi_password  = "";
 
-// key of permission, generated on control panel anto.io
-const char* key = "key";
+// Username of Anto.io account
+const char *username = "";
 
-// your default thing.
-const char* thing = "NodeMCU";
+// Key to access and control your channels, generated on Anto.io control panel
+const char* key = "";
 
-// create AntoIO object named anto.
-// using constructor AntoIO(user, key, thing)
-// or use AntoIO(user, key, thing, clientId)
-// to generate client_id yourself.
-AntoIO anto(user, key, thing);
+// Thing name
+const char* thing = "";
+
+// Global variable
+AntoIO anto(username, key, thing);
 
 bool bIsConnected = false;
-
 int Led1,Led2,Led3 = 0;
 int value = 0;
 
-
 void setup() {
-    // SSID and Password of your WiFi access point.
-    const char* ssid = "ssid";
-    const char* pwd  = "pass";
-  
     Serial.begin(115200);
     delay(10);
-
-    Serial.println();
-    Serial.println();
-    Serial.print("Anto library version: ");
-    Serial.println(anto.getVersion());
-
+    anto.showVersion();
 
     // Connect to your WiFi access point
-    if (!anto.begin(ssid, pwd)) {
-        Serial.println("Connection failed!!");
-
-        // Stop everything.
-        while (1);
+    if (!anto.begin(wifi_name, wifi_password)) {
+        Serial.println("Failed to connect to WiFi!");
+        while (1); // Stop everything
     }
-
-    Serial.println();
     Serial.println("WiFi connected");  
     Serial.println("Connecting to MQTT broker");
     
@@ -57,7 +47,6 @@ void setup() {
     anto.mqtt.connect();
 
     //port output
-  //pinMode(D0,OUTPUT);
     pinMode(D1,OUTPUT);
     pinMode(D2,OUTPUT);
     pinMode(D3,OUTPUT);
