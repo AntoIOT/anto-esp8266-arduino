@@ -69,15 +69,11 @@ void loop() {
    
 
    if(temp >= 0){
-      Antosend = String(temp);                     //แปลง temp เป็น string
-      Antosend.toCharArray(buf,Antosend.length()); //string ยัดใส่ buf
-      anto.pub("Temp",(const char*)buf);           //ใช้ buf ส่งค่าขึ้นไป
+      anto.pub("Temp",temp);           //ใช้ buf ส่งค่าขึ้นไป
    }
 
    if(humid >= 0){
-      Antosend = String(humid);
-      Antosend.toCharArray(buf,Antosend.length());
-      anto.pub("Humid",(const char*)buf);
+      anto.pub("Humid",humid);
    }
 
   delay(1000);
