@@ -1,5 +1,2 @@
 ## Anto client library for ESP8266-Arduino
-### Stable version
-0.5.2
-### Quick start
-<https://antoiot.gitbooks.io/th-doc/content/index.html>
+### This branch is a development on adopting Paho MQTT as a core library for MQTT
