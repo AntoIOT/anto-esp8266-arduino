@@ -1,5 +1,5 @@
 #######################################
-# Syntax Coloring Map For AntoIO-ESP8266-Arduino
+# Syntax Coloring Map For Anto-ESP8266-Arduino
 #######################################
 
 #######################################

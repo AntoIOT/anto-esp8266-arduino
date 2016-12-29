@@ -5,7 +5,7 @@
 * Add WiFi Manager (Smart config)
 * Add example read temperature and humidity from DHT11 and send to server
 ## 0.4.1 (2016-05-31)
-* Change client ID in MQTT connection 
+* Change client ID in MQTT connection
 * Reformat API
 * Add quick start anto example
 ## 0.3.0 (2016-05-30)
