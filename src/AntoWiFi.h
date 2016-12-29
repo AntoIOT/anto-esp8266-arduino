@@ -31,7 +31,7 @@ class AntoWiFi
 
             WiFi.begin(ssid, passphrase);
 
-            for (count = 50; count && (WiFi.status() != WL_CONNECTED); --count)
+            for (count = 50; count && (!WiFi.isConnected()); --count)
                 delay(100);
 
             if (count)
