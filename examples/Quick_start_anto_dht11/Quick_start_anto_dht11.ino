@@ -1,109 +1,84 @@
+/*
+ * This example is meant to be used as a starting point
+ * for working with Anto.io services and DHT sensor module
+ *
+ * 2017/02/08
+ * by Anto.io team
+ *
+ */
+
 #include <AntoIO.h>
 #include <DHT.h>
 
-// username of anto.io account
-const char *user = "thefarmer";
+#define DHTPIN 2    //port D4
+#define DHTTYPE DHT11
 
-// key of permission, generated on control panel anto.io
-const char* key = "key";
+const char *user = "your username";
+const char *token = "your token";
+const char *thing = "your thing";
 
-// your default thing.
-const char* thing = "Node_DHT";
-
-// create AntoIO object named anto.
-// using constructor AntoIO(user, key, thing)
-// or use AntoIO(user, key, thing, clientId)
-// to generate client_id yourself.
-AntoIO anto(user, key, thing);
-
-bool bIsConnected = false;
+// initialize AntoIO instance
+AntoIO anto(user, token, thing);
 
 String Antosend;
 char buf[5];
 
-#define DHTPIN 2    //port D4
-#define DHTTYPE DHT11
 DHT dht(DHTPIN,DHTTYPE);
 
 void setup() {
-    Serial.begin(115200);
-    delay(10);
+  Serial.begin(115200);
+  delay(10);
 
-    Serial.println();
-    Serial.println();
-    Serial.print("Anto library version: ");
-    Serial.println(anto.getVersion());
+  Serial.println();
+  Serial.println();
+  Serial.print("Anto library version: ");
+  Serial.println(anto.getVersion());
 
 
-    // Connect to your WiFi access point
-    anto.smartConfig();
+  // Connect to your WiFi access point
+  anto.wifi.smartConfig();
 
-    Serial.println();
-    Serial.println("WiFi connected");  
-    Serial.println("Connecting to MQTT broker");
-    
-    // register callback functions
-    anto.mqtt.onConnected(connectedCB);
-    anto.mqtt.onDisconnected(disconnectedCB);
-    anto.mqtt.onData(dataCB);
-    anto.mqtt.onPublished(publishedCB);
-    
-    // Connect to Anto.io MQTT broker
-    anto.mqtt.connect();
+  Serial.println();
+  Serial.println("WiFi connected, trying to connect to broker...");
 
-    //dht start
-    dht.begin();
+  while (!anto.mqtt.connect(user, token, true));
+  Serial.println("\nConnected");
+
+  //dht start
+  dht.begin();
 }
 
 
 void loop() {
-  // put your main code here, to run repeatedly:
-   float temp = dht.readTemperature();
-   float humid = dht.readHumidity();
-   
-   Serial.print("TEMP: ");
-   Serial.println(temp);
+  anto.mqtt.loop();
+  // this delay(10) is for proper functionality
+  delay(10);
 
-   Serial.print("HUMID: ");
-   Serial.println(humid);  
-   
+  if (!anto.mqtt.isConnected())
+    Serial.println("Disconnected");
 
-   if(temp >= 0){
-      anto.pub("Temp",temp);           //ใช้ buf ส่งค่าขึ้นไป
-   }
+  float temp = dht.readTemperature();
+  float humid = dht.readHumidity();
 
-   if(humid >= 0){
-      anto.pub("Humid",humid);
-   }
+  Serial.print("TEMP: ");
+  Serial.println(temp);
+
+  Serial.print("HUMID: ");
+  Serial.println(humid);
+
+  if(temp >= 0){
+     anto.mqtt.pub("Temp",temp);           //ใช้ buf ส่งค่าขึ้นไป
+  }
+
+  if(humid >= 0){
+     anto.mqtt.pub("Humid",humid);
+  }
 
   delay(1000);
 }
 
-/*
-* connectedCB(): a callback function called when the connection to the MQTT broker is establised.
-*/
-void connectedCB()
-{   
-    // If the connection is establised, subscribe channels.
-
-    bIsConnected = true;
-    Serial.println("Connected to MQTT Broker");
-    
-}
-
-/*
-* disconnectedCB(): a callback function called when the connection to the MQTT broker is broken.
-*/
-void disconnectedCB()
-{   
-    bIsConnected = false;
-    Serial.println("Disconnected to MQTT Broker");
-}
-
-/*
-* msgArrvCB(): a callback function called when there a message from the subscribed channel.
-*/
-void dataCB(String& topic, String& msg)
+// a callback function for arriving data.
+void messageReceived(String topic, String payload, char * bytes, unsigned int length)
 {
     uint8_t index = topic.indexOf('/');
 
@@ -111,22 +86,10 @@ void dataCB(String& topic, String& msg)
     index = topic.indexOf('/', index + 1);
 
     topic.remove(0, index + 1);
-   
+
     Serial.print(topic);
     Serial.print(": ");
-    Serial.println(msg);
+    Serial.println(payload);
 
 }
-
-/*
-* publishedCB(): a callback function called when the message is published.
-*/
-void publishedCB(void)
-{
-    Serial.println("published");
-}
-
-
-
-
 

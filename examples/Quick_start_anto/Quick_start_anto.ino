@@ -1,100 +1,70 @@
+/*
+ * This example is meant to be used as a starting point
+ * for working with Anto.io services
+ *
+ * 2017/02/07
+ * by Anto.io team
+ *
+ */
+
 #include <AntoIO.h>
 
-// username of anto.io account
-const char *user = "user";
+const char *ssid = "your access point SSID";
+const char *pass = "access point password";
+const char *user = "your username";
+const char *token = "your token";
+const char *thing = "your thing";
 
-// key of permission, generated on control panel anto.io
-const char* key = "key";
+// initialize AntoIO instance
+AntoIO anto(user, token, thing);
 
-// your default thing.
-const char* thing = "NodeMCU";
-
-// create AntoIO object named anto.
-// using constructor AntoIO(user, key, thing)
-// or use AntoIO(user, key, thing, clientId)
-// to generate client_id yourself.
-AntoIO anto(user, key, thing);
-
-bool bIsConnected = false;
-
-int Led1,Led2,Led3 = 0;
+int Led1 = 0, Led2 = 0, Led3 = 0;
 int value = 0;
 
 
 void setup() {
-    // SSID and Password of your WiFi access point.
-    const char* ssid = "ssid";
-    const char* pwd  = "pass";
-  
-    Serial.begin(115200);
-    delay(10);
+  Serial.begin(115200);
+  delay(10);
 
-    Serial.println();
-    Serial.println();
-    Serial.print("Anto library version: ");
-    Serial.println(anto.getVersion());
+  Serial.println();
+  Serial.println();
+  Serial.print("Anto library version: ");
+  Serial.println(anto.getVersion());
 
 
-    // Connect to your WiFi access point
-    if (!anto.begin(ssid, pwd)) {
-        Serial.println("Connection failed!!");
+  Serial.print("\nTrying to connect ");
+  Serial.print(ssid);
+  Serial.println("...");
 
-        // Stop everything.
-        while (1);
-    }
+  while (!anto.wifi.begin(ssid, pass));
+  Serial.println("\nConnected, trying to connect to broker...");
 
-    Serial.println();
-    Serial.println("WiFi connected");  
-    Serial.println("Connecting to MQTT broker");
-    
-    // register callback functions
-    anto.mqtt.onConnected(connectedCB);
-    anto.mqtt.onDisconnected(disconnectedCB);
-    anto.mqtt.onData(dataCB);
-    anto.mqtt.onPublished(publishedCB);
-    
-    // Connect to Anto.io MQTT broker
-    anto.mqtt.connect();
+  while (!anto.mqtt.connect(user, token, true));
+  Serial.println("\nConnected");
 
-    //port output
+  //port output
   //pinMode(D0,OUTPUT);
-    pinMode(D1,OUTPUT);
-    pinMode(D2,OUTPUT);
-    pinMode(D3,OUTPUT);
+  pinMode(D1,OUTPUT);
+  pinMode(D2,OUTPUT);
+  pinMode(D3,OUTPUT);
+
+  anto.mqtt.sub("LED1");
+  anto.mqtt.sub("LED2");
+  anto.mqtt.sub("LED3");
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
+  anto.mqtt.loop();
+  // this delay(10) is for proper functionality
+  delay(10);
+
+  if (!anto.mqtt.isConnected())
+    Serial.println("Disconnected");
 }
 
-/*
-* connectedCB(): a callback function called when the connection to the MQTT broker is establised.
-*/
-void connectedCB()
-{   
-    // If the connection is establised, subscribe channels.
 
-    bIsConnected = true;
-    Serial.println("Connected to MQTT Broker");
-    
-    anto.sub("LED1");
-    anto.sub("LED2");
-    anto.sub("LED3");
-}
-
-/*
-* disconnectedCB(): a callback function called when the connection to the MQTT broker is broken.
-*/
-void disconnectedCB()
-{   
-    bIsConnected = false;
-    Serial.println("Disconnected to MQTT Broker");
-}
-
-/*
-* msgArrvCB(): a callback function called when there a message from the subscribed channel.
-*/
-void dataCB(String& topic, String& msg)
+// a callback function for arriving data.
+void messageReceived(String topic, String payload, char * bytes, unsigned int length)
 {
     uint8_t index = topic.indexOf('/');
 
@@ -102,23 +72,23 @@ void dataCB(String& topic, String& msg)
     index = topic.indexOf('/', index + 1);
 
     topic.remove(0, index + 1);
-   
+
     Serial.print(topic);
     Serial.print(": ");
-    Serial.println(msg);
+    Serial.println(payload);
 
     if(topic.equals("LED1")){
-      value = msg.toInt();
+      value = payload.toInt();
       if(value == 1){
         digitalWrite(D1,HIGH);
       }
       else{
         digitalWrite(D1,LOW);
       }
-      
+
     }
     else if(topic.equals("LED2")){
-     value = msg.toInt();
+     value = payload.toInt();
      if(value == 1){
         digitalWrite(D2,HIGH);
       }
@@ -127,7 +97,7 @@ void dataCB(String& topic, String& msg)
       }
     }
     else if(topic.equals("LED3")){
-      value = msg.toInt();
+      value = payload.toInt();
       if(value == 1){
         digitalWrite(D3,HIGH);
       }
@@ -136,15 +106,4 @@ void dataCB(String& topic, String& msg)
       }
     }
 }
-
-/*
-* publishedCB(): a callback function called when the message is published.
-*/
-void publishedCB(void)
-{
-    Serial.println("published");
-}
-
-
-
 
