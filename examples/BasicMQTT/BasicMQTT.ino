@@ -35,6 +35,12 @@ void setup() {
   while (!anto.wifi.begin(ssid, pass));
   Serial.println("\nConnected, trying to connect to broker...");
 
+  // the last boolean argument is for indicating
+  // that you want this connection to be secured
+  // by TLS or not.
+  //
+  // Secured connection will be
+  // slower than secured one.
   while (!anto.mqtt.connect(user, token, true));
   Serial.println("\nConnected");
 
