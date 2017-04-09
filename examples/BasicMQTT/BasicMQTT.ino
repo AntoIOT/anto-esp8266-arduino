@@ -44,6 +44,7 @@ void setup() {
   while (!anto.mqtt.connect(user, token, true));
   Serial.println("\nConnected");
 
+  anto.mqtt.onData(messageReceived);
   anto.mqtt.sub("channel");
 }
 
