@@ -3,6 +3,5 @@
 
 ###### TODO ######
 - Reconnect procedure in the `AntoIO::mqtt.loop()` function
-- User callback functions in MQTT
-- Other callback functions (OnPublished, OnDisconnected, ...)
+- Other callback functions (OnPublished, OnDisconnected, OnConnected)
 - Make this library available in File -> Examples in Arduino IDE

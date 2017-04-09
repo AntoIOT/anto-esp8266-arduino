@@ -48,9 +48,9 @@ bool AntoMQTT::connect(
     clientId.toCharArray(buf, clientId.length() + 1);
 
     if (secure)
-        this->_mqtt.begin(ANTO_BROKER, ANTO_MQTTS_PORT, this->_nets);
+        this->_mqtt.begin(ANTO_BROKER, ANTO_MQTTS_PORT, this->_nets, this, &AntoMQTT::MQTTClient_messageHandler);
     else
-        this->_mqtt.begin(ANTO_BROKER, ANTO_MQTT_PORT, this->_net);
+        this->_mqtt.begin(ANTO_BROKER, ANTO_MQTT_PORT, this->_net, this, &AntoMQTT::MQTTClient_messageHandler);
 
     for (
             count = 50;
@@ -183,7 +183,7 @@ bool AntoMQTT::sub(const char *thing, const char *channel, int qos)
     topic += "/";
     topic += channel;
 
-    return this->_mqtt.subscribe(topic);
+    return this->_mqtt.subscribe(topic, this);
 }
 
 bool AntoMQTT::sub(String& thing, String& channel, int qos)
@@ -196,7 +196,7 @@ bool AntoMQTT::sub(String& thing, String& channel, int qos)
     topic += "/";
     topic += channel;
 
-    return this->_mqtt.subscribe(topic);
+    return this->_mqtt.subscribe(topic, this);
 }
 
 bool AntoMQTT::service(const char *name, int qos)
@@ -204,6 +204,27 @@ bool AntoMQTT::service(const char *name, int qos)
     String service("service/");
     service += name;
 
-    return this->_mqtt.subscribe(service);
+    return this->_mqtt.subscribe(service, this);
 }
 
+void AntoMQTT::MQTTClient_messageHandler(MQTT::MessageData &messageData) {
+  MQTT::Message &message = messageData.message;
+
+  // null terminate topic to create String object
+  int len = messageData.topicName.lenstring.len;
+  char topic[len+1];
+  memcpy(topic, messageData.topicName.lenstring.data, (size_t)len);
+  topic[len] = '\0';
+
+  // get payload
+  char * payload = (char *)message.payload;
+
+  // null terminate payload if enough space is available
+  if(message.payloadlen < MQTT_BUFFER_SIZE) {
+    payload[message.payloadlen] = '\0';
+  }
+
+  if (this->_onData)
+      _onData(String(topic), String(payload), (char*)message.payload, (unsigned int)message.payloadlen);
+  // messageReceived(String(topic), String(payload), (char*)message.payload, (unsigned int)message.payloadlen);
+}

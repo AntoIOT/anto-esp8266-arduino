@@ -1,3 +1,6 @@
+## 0.6.1 (2016-06-16)
+* MQTT over SSL/TLS supported
+* New structure of the library
 ## 0.5.2 (2016-06-16)
 * Add new overload methods for AntoIO::pub() (Integer, String, Character and Floating point)
 * Edit example BasicMQTT

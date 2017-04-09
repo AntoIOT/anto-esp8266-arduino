@@ -10,12 +10,17 @@ class AntoMQTT
 {
     public:
         AntoMQTT(const char *user, const char *token, const char *thing):
-            _user(user), _token(token), _thing(thing), _mqtt(), _net(), _nets()
+            _mqtt(), _nets(), _net(), _user(user), _token(token), _thing(thing), _onData(NULL)
         { }
 
         void loop(void)
         {
             this->_mqtt.loop();
+        }
+
+        void onData(void (*_onData) (String, String, char*, unsigned int))
+        {
+            this->_onData = _onData;
         }
 
         bool disconnect(void)
@@ -63,14 +68,18 @@ class AntoMQTT
             service(const char *name, int qos = 0);
 
     private:
-        MQTTClient          _mqtt;
-        WiFiClientSecure    _nets;
-        WiFiClient          _net;
+        MQTTClient<AntoMQTT>    _mqtt;
+        WiFiClientSecure        _nets;
+        WiFiClient              _net;
+
+        void MQTTClient_messageHandler(MQTT::MessageData &messageData);
 
         const char
             *_user,
             *_token,
             *_thing;
+
+        void (*_onData) (String, String, char*, unsigned int);
 };
 
 #endif
