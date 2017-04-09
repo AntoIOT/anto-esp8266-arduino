@@ -1,5 +1,7 @@
+## 0.6.3 (2017-04-09)
+* add Anto::http.setHost() and Anto::mqtt.setHost() functions to change URL of the server
 ## 0.6.2 (2017-04-09)
-* remove username and password parameters from Anto::mqtt::connect
+* remove username and password parameters from Anto::mqtt.connect()
 ## 0.6.1 (2017-04-09)
 * MQTT over SSL/TLS supported
 * New structure of the library

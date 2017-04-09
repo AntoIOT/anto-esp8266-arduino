@@ -3,7 +3,6 @@
 #include "json/ArduinoJson.h"
 #include "AntoHTTP.h"
 
-#define ANTO_HOST   "api.anto.io"
 #define ANTO_GET    "/channel/get/"
 #define ANTO_SET    "/channel/set/"
 
@@ -21,7 +20,7 @@ bool AntoHTTP::digitalUpdate(
         channel + "/" +
         (value ? "1" : "0");
 
-    if (!httpRequest(str, ANTO_HOST, arg))
+    if (!httpRequest(str, _host, arg))
         return false;
 
     removeHeader(str);
@@ -46,7 +45,7 @@ bool AntoHTTP::analogUpdate(
         channel + "/" +
         String(value);
 
-    if (!httpRequest(str, ANTO_HOST, arg))
+    if (!httpRequest(str, _host, arg))
         return false;
 
     removeHeader(str);
@@ -71,7 +70,7 @@ bool AntoHTTP::stringUpdate(
         thing + "/" +
         channel + "/" + value;
 
-    if (!httpRequest(str, ANTO_HOST, arg))
+    if (!httpRequest(str, _host, arg))
         return false;
 
     removeHeader(str);
@@ -93,7 +92,7 @@ bool AntoHTTP::digitalGet(bool &val, const char* thing, const char* channel)
         thing + "/" +
         channel;
 
-    if (!httpRequest(str, ANTO_HOST, arg))
+    if (!httpRequest(str, _host, arg))
         return false;
 
     removeHeader(str);
@@ -121,7 +120,7 @@ bool AntoHTTP::analogGet(int32_t &val, const char* thing, const char* channel)
         thing + "/" +
         channel;
 
-    if (!httpRequest(str, ANTO_HOST, arg))
+    if (!httpRequest(str, _host, arg))
         return false;
 
     removeHeader(str);
@@ -150,7 +149,7 @@ bool AntoHTTP::stringGet(String &val, const char* thing, const char* channel)
         + "/" + thing
         + "/" + channel;
 
-    if (!httpRequest(str, ANTO_HOST, arg))
+    if (!httpRequest(str, _host, arg))
         return false;
 
     removeHeader(str);
@@ -202,7 +201,7 @@ bool AntoHTTP::request(String &val, const char *service)
     val = String("");
     arg = String("/request/") + _token + "/" + service;
 
-    if (!httpRequest(str, ANTO_HOST, arg))
+    if (!httpRequest(str, _host, arg))
         return false;
 
     removeHeader(str);

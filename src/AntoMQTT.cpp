@@ -1,7 +1,6 @@
 #include "AntoMQTT.h"
 #include "AntoCommon.h"
 
-#define ANTO_BROKER         "service.anto.io"
 #define ANTO_MQTT_PORT      1883
 #define ANTO_MQTTS_PORT     1884
 #define ANTO_RAND_STR_LEN   10
@@ -46,9 +45,9 @@ bool AntoMQTT::connect(
     clientId.toCharArray(buf, clientId.length() + 1);
 
     if (secure)
-        this->_mqtt.begin(ANTO_BROKER, ANTO_MQTTS_PORT, this->_nets, this, &AntoMQTT::MQTTClient_messageHandler);
+        this->_mqtt.begin(_host, ANTO_MQTTS_PORT, this->_nets, this, &AntoMQTT::MQTTClient_messageHandler);
     else
-        this->_mqtt.begin(ANTO_BROKER, ANTO_MQTT_PORT, this->_net, this, &AntoMQTT::MQTTClient_messageHandler);
+        this->_mqtt.begin(_host, ANTO_MQTT_PORT, this->_net, this, &AntoMQTT::MQTTClient_messageHandler);
 
     for (
             count = 50;
