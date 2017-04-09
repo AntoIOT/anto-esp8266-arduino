@@ -22,14 +22,18 @@ class AntoIO
             wifi()
         { }
 
-        const char* getVersion(void)
-        {
-            static const char *ver = ANTO_VER;
+        const char* getVersion(void);
 
-            return ver;
-        }
+        void begin(
+                     const char *ssid,
+                     const char* pwd,
+                     void (*_onData) (String, String, char*, unsigned int),
+                     bool secure = false);
+
 
     private:
+        void printArtWork(void);
+
         const char
             *_user,
             *_token,
