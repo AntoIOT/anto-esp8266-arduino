@@ -20,8 +20,6 @@ static void gen_random(char *s, const uint8_t len)
 }
 
 bool AntoMQTT::connect(
-        const char* username,
-        const char* password,
         bool secure,
         const char * client_id)
 {

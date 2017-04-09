@@ -33,11 +33,7 @@ class AntoMQTT
             return this->_mqtt.connected();
         }
 
-        bool connect(
-                const char* username,
-                const char* password,
-                bool secure = false,
-                const char * client_id = ""),
+        bool connect( bool secure = false, const char * client_id = ""),
 
             pub(const char *channel, const char *msg,
                     int qos = 0, bool retain = false),

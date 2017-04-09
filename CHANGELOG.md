@@ -1,4 +1,6 @@
-## 0.6.1 (2016-06-16)
+## 0.6.2 (2017-04-09)
+* remove username and password parameters from Anto::mqtt::connect
+## 0.6.1 (2017-04-09)
 * MQTT over SSL/TLS supported
 * New structure of the library
 ## 0.5.2 (2016-06-16)
