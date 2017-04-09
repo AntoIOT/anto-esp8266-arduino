@@ -41,7 +41,7 @@ void setup() {
   //
   // Secured connection will be
   // slower than secured one.
-  while (!anto.mqtt.connect(user, token, true));
+  while (!anto.mqtt.connect(true));
   Serial.println("\nConnected");
 
   anto.mqtt.onData(messageReceived);
