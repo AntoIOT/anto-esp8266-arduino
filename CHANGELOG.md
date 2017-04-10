@@ -1,3 +1,5 @@
+## 0.7.0 (2017-04-10)
+* distract arrived messages in AntoMQTT::messageHandler() into [thing, channel, payload]
 ## 0.6.4 (2017-04-10)
 * add AntoIO::begin() to simplify the process
 ## 0.6.3 (2017-04-09)

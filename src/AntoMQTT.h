@@ -6,6 +6,8 @@
 
 #include "mqtt/MQTTClient.h"
 
+typedef void (*onMsg) (String, String, String);
+
 class AntoMQTT
 {
     public:
@@ -22,9 +24,9 @@ class AntoMQTT
             this->_mqtt.loop();
         }
 
-        void onData(void (*_onData) (String, String, char*, unsigned int))
+        void onData(onMsg onData)
         {
-            this->_onData = _onData;
+            this->_onData = onData;
         }
 
         bool disconnect(void)
@@ -80,7 +82,7 @@ class AntoMQTT
         WiFiClientSecure        _nets;
         WiFiClient              _net;
 
-        void MQTTClient_messageHandler(MQTT::MessageData &messageData);
+        void messageHandler(MQTT::MessageData &messageData);
 
         const char
             *_user,
@@ -89,7 +91,7 @@ class AntoMQTT
 
         char *_host;
 
-        void (*_onData) (String, String, char*, unsigned int);
+        onMsg _onData;
 };
 
 #endif

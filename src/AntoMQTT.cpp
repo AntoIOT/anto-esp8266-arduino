@@ -45,9 +45,18 @@ bool AntoMQTT::connect(
     clientId.toCharArray(buf, clientId.length() + 1);
 
     if (secure)
-        this->_mqtt.begin(_host, ANTO_MQTTS_PORT, this->_nets, this, &AntoMQTT::MQTTClient_messageHandler);
+        this->_mqtt.begin(
+                _host,
+                ANTO_MQTTS_PORT,
+                this->_nets, this,
+                &AntoMQTT::messageHandler);
     else
-        this->_mqtt.begin(_host, ANTO_MQTT_PORT, this->_net, this, &AntoMQTT::MQTTClient_messageHandler);
+        this->_mqtt.begin(
+                _host,
+                ANTO_MQTT_PORT,
+                this->_net,
+                this,
+                &AntoMQTT::messageHandler);
 
     for (
             count = 50;
@@ -204,7 +213,8 @@ bool AntoMQTT::service(const char *name, int qos)
     return this->_mqtt.subscribe(service, this);
 }
 
-void AntoMQTT::MQTTClient_messageHandler(MQTT::MessageData &messageData) {
+void AntoMQTT::messageHandler(MQTT::MessageData &messageData)
+{
   MQTT::Message &message = messageData.message;
 
   // null terminate topic to create String object
@@ -212,6 +222,10 @@ void AntoMQTT::MQTTClient_messageHandler(MQTT::MessageData &messageData) {
   char topic[len+1];
   memcpy(topic, messageData.topicName.lenstring.data, (size_t)len);
   topic[len] = '\0';
+
+  char *channel = strrchr(topic, '/') + 1;
+  *(channel - 1) = '\0';
+  char *thing = strrchr(topic, '/') + 1;
 
   // get payload
   char * payload = (char *)message.payload;
@@ -222,6 +236,6 @@ void AntoMQTT::MQTTClient_messageHandler(MQTT::MessageData &messageData) {
   }
 
   if (this->_onData)
-      _onData(String(topic), String(payload), (char*)message.payload, (unsigned int)message.payloadlen);
+      _onData(String(thing), String(channel), String(payload));
   // messageReceived(String(topic), String(payload), (char*)message.payload, (unsigned int)message.payloadlen);
 }

@@ -27,7 +27,7 @@ class AntoIO
         void begin(
                      const char *ssid,
                      const char* pwd,
-                     void (*_onData) (String, String, char*, unsigned int),
+                     onMsg onData,
                      bool secure = false);
 
 

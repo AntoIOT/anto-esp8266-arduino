@@ -20,7 +20,7 @@ void AntoIO::printArtWork(void)
 void AntoIO::begin(
         const char *ssid,
         const char* pwd,
-        void (*_onData) (String, String, char*, unsigned int),
+        onMsg onData,
         bool secure)
 {
     while (!this->wifi.begin(ssid, pwd));
@@ -33,5 +33,5 @@ void AntoIO::begin(
     Serial.println("Broker Connected");
 
     printArtWork();
-    this->mqtt.onData(_onData);
+    this->mqtt.onData(onData);
 }
