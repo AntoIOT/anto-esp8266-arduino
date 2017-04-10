@@ -13,15 +13,25 @@ class AntoMQTT
     public:
         AntoMQTT(const char *user, const char *token, const char *thing):
             _mqtt(), _nets(), _net(), _user(user),
-            _token(token), _thing(thing), _onData(NULL)
+            _token(token), _thing(thing),_lastConnSecure(false),
+            _onData(NULL)
     {
         _host = (char *) malloc(sizeof("service.anto.io"));
         strcpy(_host, "service.anto.io");
+
+        _lastConnClientId = (char *) malloc(1);
+        *_lastConnClientId = '\0';
     }
 
         void loop(void)
         {
             this->_mqtt.loop();
+
+            if (!(this->_mqtt.connected()))
+                while (!this->connect(_lastConnSecure, _lastConnClientId))
+                    delay(500);
+
+            delay(10);
         }
 
         void onData(onMsg onData)
@@ -89,7 +99,11 @@ class AntoMQTT
             *_token,
             *_thing;
 
-        char *_host;
+        char
+            *_host,
+            *_lastConnClientId;
+
+        bool _lastConnSecure;
 
         onMsg _onData;
 };

@@ -1,16 +1,18 @@
+## 0.7.1 (2017-04-10)
+* add reconnect procedure inside `AntoMQTT::loop()`
 ## 0.7.0 (2017-04-10)
-* distract arrived messages in AntoMQTT::messageHandler() into [thing, channel, payload]
+* distract arrived messages in `AntoMQTT::messageHandler()` into [thing, channel, payload]
 ## 0.6.4 (2017-04-10)
-* add AntoIO::begin() to simplify the process
+* add `AntoIO::begin()` to simplify the process
 ## 0.6.3 (2017-04-09)
-* add AntoIO::http.setHost() and AntoIO::mqtt.setHost() functions to change URL of the server
+* add `AntoIO::http.setHost()` and `AntoIO::mqtt.setHost()` functions to change URL of the server
 ## 0.6.2 (2017-04-09)
-* remove username and password parameters from AntoIO::mqtt.connect()
+* remove username and password parameters from `AntoIO::mqtt.connect()`
 ## 0.6.1 (2017-04-09)
 * MQTT over SSL/TLS supported
 * New structure of the library
 ## 0.5.2 (2016-06-16)
-* Add new overload methods for AntoIO::pub() (Integer, String, Character and Floating point)
+* Add new overload methods for `AntoIO::pub()` (Integer, String, Character and Floating point)
 * Edit example BasicMQTT
 ## 0.5.0 (2016-06-16)
 * Add WiFi Manager (Smart config)

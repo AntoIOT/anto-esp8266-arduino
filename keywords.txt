@@ -6,36 +6,47 @@
 # Datatypes (KEYWORD1)
 #######################################
 
-AntoIO	KEYWORD1
+AntoIO	    KEYWORD1
+AntoHTTP	KEYWORD1
+AntoMQTT	KEYWORD1
+AntoWiFi	KEYWORD1
 
 #######################################
 # Methods and Functions (KEYWORD2)
 #######################################
 
-smartconfig	KEYWORD2
-begin	KEYWORD2
+smartconfig	    KEYWORD2
+
 digitalUpdate	KEYWORD2
 analogUpdate	KEYWORD2
 stringUpdate	KEYWORD2
-digitalGet	KEYWORD2
-analogGet	KEYWORD2
-stringGet	KEYWORD2
-requestHttp	KEYWORD2
-request	KEYWORD2
-pub	KEYWORD2
-sub	KEYWORD2
-service	KEYWORD2
-responseFilter	KEYWORD2
-isResponseSuccess	KEYWORD2
-gen_random KEYWORD2
+digitalGet	    KEYWORD2
+analogGet	    KEYWORD2
+stringGet	    KEYWORD2
+httpRequest	    KEYWORD2
+request	        KEYWORD2
+removeHeader	KEYWORD2
+setHost	        KEYWORD2
+
+getVersion	    KEYWORD2
+begin	        KEYWORD2
+
+loop	        KEYWORD2
+onData	        KEYWORD2
+disconnect	    KEYWORD2
+isConnected	    KEYWORD2
+connect	        KEYWORD2
+pub	            KEYWORD2
+sub	            KEYWORD2
+service	        KEYWORD2
 
 #######################################
 # Constants (LITERAL1)
 #######################################
-ANTO_VER	LITERAL1
-ANTO_HOST	LITERAL1
-ANTO_BROKER	LITERAL1
-ANTO_GET	LITERAL1
-ANTO_SET	LITERAL1
-ANTO_BROKER_PORT	LITERAL1
+
+ANTO_MQTT_PORT	    LITERAL1
+ANTO_MQTTS_PORT	    LITERAL1
 ANTO_RAND_STR_LEN	LITERAL1
+ANTO_GET	        LITERAL1
+ANTO_SET	        LITERAL1
+ANTO_VER	LITERAL1

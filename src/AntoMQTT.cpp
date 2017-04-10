@@ -38,6 +38,10 @@ bool AntoMQTT::connect(
         clientId += randString;
     } else {
         clientId += client_id;
+
+        free(_lastConnClientId);
+        _lastConnClientId = (char *) malloc(sizeof(client_id));
+        strcpy(_lastConnClientId, client_id);
     }
 
     char buf[clientId.length() + 1];
@@ -63,6 +67,8 @@ bool AntoMQTT::connect(
             count && (!this->_mqtt.connect(buf, this->_user, this->_token));
             --count)
         delay(100);
+
+    _lastConnSecure = secure;
 
     if (count == 0)
         return false;
