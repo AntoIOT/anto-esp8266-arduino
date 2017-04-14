@@ -1,3 +1,5 @@
+## 0.7.2 (2017-04-15)
+* add shortcuts from AntoHTTP and AntoMQTT to AntoIO
 ## 0.7.1 (2017-04-10)
 * add reconnect procedure inside `AntoMQTT::loop()`
 ## 0.7.0 (2017-04-10)

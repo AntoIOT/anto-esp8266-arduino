@@ -31,7 +31,7 @@ class AntoMQTT
                 while (!this->connect(_lastConnSecure, _lastConnClientId))
                     delay(500);
 
-            delay(10);
+            delay(100);
         }
 
         void onData(onMsg onData)

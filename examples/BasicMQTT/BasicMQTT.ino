@@ -15,9 +15,8 @@ const char *user = "your username";
 const char *token = "your token";
 const char *thing = "your thing";
 
-// initialize AntoIO instance
 AntoIO anto(user, token, thing);
-// for counting how many loop has passed
+
 uint8_t loopCount = 0;
 
 void setup() {
@@ -50,30 +49,20 @@ void setup() {
 
 void loop() {
   anto.mqtt.loop();
-  // this delay(10) is for proper functionality
-  delay(10);
 
   ++loopCount;
 
-  // if this NodeMCU is connected to Anto broker
-  // then publish 'value' to 'other_channel'
-  if (anto.mqtt.isConnected()) {
-    // if 'loopCount' is even number, update 'other_channel' channel to 'other_value'
-    // otherwise, update it to 'value'
-    anto.mqtt.pub("other_channel", (loopCount % 2 ? "value" : "other_value"));
-  } else {
-    Serial.println("Disconnected");
-  }
+  anto.mqtt.pub("other_channel", (loopCount % 2 ? "value" : "other_value"));
 
   delay(3000);
 }
 
 // a callback function for arriving data.
-void messageReceived(String topic, String payload, char * bytes, unsigned int length)
-{
-  Serial.print("incoming: ");
-  Serial.print(topic);
-  Serial.print(" - ");
-  Serial.print(payload);
-  Serial.println();
+void messageReceived(String thing, String channel, String payload) {
+  Serial.print("Recieved: ");
+  Serial.print(thing);
+  Serial.print("/");
+  Serial.print(channel);
+  Serial.print("-> ");
+  Serial.println(payload);
 }

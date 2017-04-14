@@ -8,7 +8,7 @@ class AntoHTTP
     public:
         AntoHTTP(const char *token, const char *thing):
             _token(token), _thing(thing)
-    { 
+    {
         _host = (char *) malloc(sizeof("api.anto.io"));
         strcpy(_host, "api.anto.io");
     }

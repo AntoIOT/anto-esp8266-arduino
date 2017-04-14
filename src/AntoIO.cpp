@@ -33,5 +33,10 @@ void AntoIO::begin(
     Serial.println("Broker Connected");
 
     printArtWork();
+
+    Serial.print("Anto library version: ");
+    Serial.println(this->getVersion());
+    Serial.println();
+
     this->mqtt.onData(onData);
 }

@@ -7,3 +7,4 @@
 - Upload this library to Arduino repository
 - Request via HTTPS
 - Increase speed of keep-alive message
+- Timer interrupt and remove `AntoMQTT::loop()`

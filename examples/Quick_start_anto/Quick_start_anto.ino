@@ -39,7 +39,7 @@ void setup() {
   while (!anto.wifi.begin(ssid, pass));
   Serial.println("\nConnected, trying to connect to broker...");
 
-  while (!anto.mqtt.connect(user, token, true));
+  while (!anto.mqtt.connect());
   Serial.println("\nConnected");
 
   //port output
@@ -55,55 +55,46 @@ void setup() {
 
 void loop() {
   anto.mqtt.loop();
-  // this delay(10) is for proper functionality
-  delay(10);
-
-  if (!anto.mqtt.isConnected())
-    Serial.println("Disconnected");
 }
 
 
 // a callback function for arriving data.
-void messageReceived(String topic, String payload, char * bytes, unsigned int length)
-{
-    uint8_t index = topic.indexOf('/');
+void messageReceived(String thing, String channel, String payload) {
 
-    index = topic.indexOf('/', index + 1);
-    index = topic.indexOf('/', index + 1);
-
-    topic.remove(0, index + 1);
-
-    Serial.print(topic);
-    Serial.print(": ");
+    Serial.print("Recieved: ");
+    Serial.print(thing);
+    Serial.print("/");
+    Serial.print(channel);
+    Serial.print("-> ");
     Serial.println(payload);
 
-    if(topic.equals("LED1")){
-      value = payload.toInt();
-      if(value == 1){
-        digitalWrite(D1,HIGH);
-      }
-      else{
-        digitalWrite(D1,LOW);
-      }
+    if(channel.equals("LED1")){
+        value = payload.toInt();
+        if(value == 1){
+            digitalWrite(D1,HIGH);
+        }
+        else{
+            digitalWrite(D1,LOW);
+        }
 
     }
-    else if(topic.equals("LED2")){
-     value = payload.toInt();
-     if(value == 1){
-        digitalWrite(D2,HIGH);
-      }
-      else{
-        digitalWrite(D2,LOW);
-      }
+    else if(channel.equals("LED2")){
+        value = payload.toInt();
+        if(value == 1){
+            digitalWrite(D2,HIGH);
+        }
+        else{
+            digitalWrite(D2,LOW);
+        }
     }
-    else if(topic.equals("LED3")){
-      value = payload.toInt();
-      if(value == 1){
-        digitalWrite(D3,HIGH);
-      }
-      else{
-        digitalWrite(D3,LOW);
-      }
+    else if(channel.equals("LED3")){
+        value = payload.toInt();
+        if(value == 1){
+            digitalWrite(D3,HIGH);
+        }
+        else{
+            digitalWrite(D3,LOW);
+        }
     }
 }
 

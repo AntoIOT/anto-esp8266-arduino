@@ -41,7 +41,7 @@ void setup() {
   Serial.println();
   Serial.println("WiFi connected, trying to connect to broker...");
 
-  while (!anto.mqtt.connect(user, token, true));
+  while (!anto.mqtt.connect());
   Serial.println("\nConnected");
 
   //dht start
@@ -51,8 +51,6 @@ void setup() {
 
 void loop() {
   anto.mqtt.loop();
-  // this delay(10) is for proper functionality
-  delay(10);
 
   if (!anto.mqtt.isConnected())
     Serial.println("Disconnected");
@@ -78,18 +76,12 @@ void loop() {
 }
 
 // a callback function for arriving data.
-void messageReceived(String topic, String payload, char * bytes, unsigned int length)
-{
-    uint8_t index = topic.indexOf('/');
-
-    index = topic.indexOf('/', index + 1);
-    index = topic.indexOf('/', index + 1);
-
-    topic.remove(0, index + 1);
-
-    Serial.print(topic);
-    Serial.print(": ");
-    Serial.println(payload);
-
+void messageReceived(String thing, String channel, String payload) {
+  Serial.print("Recieved: ");
+  Serial.print(thing);
+  Serial.print("/");
+  Serial.print(channel);
+  Serial.print("-> ");
+  Serial.println(payload);
 }
 
