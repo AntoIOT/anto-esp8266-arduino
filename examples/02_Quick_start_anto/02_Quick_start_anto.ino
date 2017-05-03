@@ -48,6 +48,7 @@ void setup() {
   pinMode(D2,OUTPUT);
   pinMode(D3,OUTPUT);
 
+  anto.mqtt.onData(messageReceived);
   anto.mqtt.sub("LED1");
   anto.mqtt.sub("LED2");
   anto.mqtt.sub("LED3");
