@@ -2,7 +2,7 @@
  * This example is meant to be used as a starting point
  * for working with Anto.io services
  *
- * 2017/02/07
+ * 2017/06/17
  * by Anto.io team
  *
  */
@@ -18,9 +18,7 @@ const char *thing = "your thing";
 // initialize AntoIO instance
 AntoIO anto(user, token, thing);
 
-int Led1 = 0, Led2 = 0, Led3 = 0;
 int value = 0;
-
 
 void setup() {
   Serial.begin(115200);
@@ -36,22 +34,18 @@ void setup() {
   Serial.print(ssid);
   Serial.println("...");
 
-  while (!anto.wifi.begin(ssid, pass));
-  Serial.println("\nConnected, trying to connect to broker...");
+  anto.begin(ssid, pass, messageReceived);
+  Serial.println("\nConnected Anto done");
 
-  while (!anto.mqtt.connect());
-  Serial.println("\nConnected");
+  //Subscript Channels
+  anto.sub("LED1");
+  anto.sub("LED2");
+  anto.sub("LED3");
 
-  //port output
-  //pinMode(D0,OUTPUT);
+  //Port output
   pinMode(D1,OUTPUT);
   pinMode(D2,OUTPUT);
   pinMode(D3,OUTPUT);
-
-  anto.mqtt.onData(messageReceived);
-  anto.mqtt.sub("LED1");
-  anto.mqtt.sub("LED2");
-  anto.mqtt.sub("LED3");
 }
 
 void loop() {
@@ -98,4 +92,5 @@ void messageReceived(String thing, String channel, String payload) {
         }
     }
 }
+
 
