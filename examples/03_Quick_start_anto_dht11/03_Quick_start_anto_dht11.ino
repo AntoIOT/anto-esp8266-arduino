@@ -2,7 +2,7 @@
  * This example is meant to be used as a starting point
  * for working with Anto.io services and DHT sensor module
  *
- * 2017/02/08
+ * 2017/06/17
  * by Anto.io team
  *
  */
@@ -13,6 +13,8 @@
 #define DHTPIN 2    //port D4
 #define DHTTYPE DHT11
 
+const char *ssid = "your access point SSID";
+const char *pass = "access point password";
 const char *user = "your username";
 const char *token = "your token";
 const char *thing = "your thing";
@@ -20,9 +22,7 @@ const char *thing = "your thing";
 // initialize AntoIO instance
 AntoIO anto(user, token, thing);
 
-String Antosend;
-char buf[5];
-
+//initialize dht instance
 DHT dht(DHTPIN,DHTTYPE);
 
 void setup() {
@@ -34,15 +34,12 @@ void setup() {
   Serial.print("Anto library version: ");
   Serial.println(anto.getVersion());
 
+  Serial.print("\nTrying to connect ");
+  Serial.print(ssid);
+  Serial.println("...");
 
-  // Connect to your WiFi access point
-  anto.wifi.smartConfig();
-
-  Serial.println();
-  Serial.println("WiFi connected, trying to connect to broker...");
-
-  while (!anto.mqtt.connect());
-  Serial.println("\nConnected");
+  anto.begin(ssid, pass, messageReceived);
+  Serial.println("\nConnected Anto done");
 
   //dht start
   dht.begin();
@@ -65,11 +62,11 @@ void loop() {
   Serial.println(humid);
 
   if(temp >= 0){
-     anto.mqtt.pub("Temp",temp);           //ใช้ buf ส่งค่าขึ้นไป
+     anto.pub("Temp",temp);           
   }
 
   if(humid >= 0){
-     anto.mqtt.pub("Humid",humid);
+     anto.pub("Humid",humid);
   }
 
   delay(1000);
