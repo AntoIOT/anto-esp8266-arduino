@@ -1,3 +1,5 @@
+## 0.7.3 (2017-06-18)
+* remove number from the names of example folders for library manager compatability
 ## 0.7.2 (2017-04-15)
 * add shortcuts from AntoHTTP and AntoMQTT to AntoIO
 ## 0.7.1 (2017-04-10)
